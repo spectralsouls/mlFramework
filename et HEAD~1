@@ -1,0 +1,47 @@
+[33mcommit 5f07519b41bea7378af25c32b98dfd610ad5844a[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 21:11:18 2024 +0200
+
+    sigmoid and dotproduct
+
+[33mcommit 6a83a479793c50be064fada87c8559ba50e9b4de[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 21:04:55 2024 +0200
+
+    initial commit on mlops
+
+[33mcommit e6db69f63f4e91223d2d7a727fbfaea3f7389e5b[m
+Author: spectralsouls <54539969+spectralsouls@users.noreply.github.com>
+Date:   Thu Apr 11 21:02:16 2024 +0200
+
+    new repo name
+
+[33mcommit 845b7ed1cd07e2a6423c5b6ae797f86534b821eb[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 10:51:19 2024 +0200
+
+    forward pass
+
+[33mcommit 861f654b1f2ba073eafbfdeac8e612835ed66d6d[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 09:32:46 2024 +0200
+
+    initial forward pass
+
+[33mcommit 0613bad2bac14b153d8c7fd7863642a1c6a45b3f[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 08:18:02 2024 +0200
+
+    replace model with layer, assign weights
+
+[33mcommit b7609068aee645833ddeb062c0cf399a969f3fc0[m
+Author: Igorg9865 <igor.gavric111@gmail.com>
+Date:   Thu Apr 11 07:42:11 2024 +0200
+
+    Initial merge
+
+[33mcommit 07a92ff0ec74f279d1ce0098600949d26abb93dc[m
+Author: Igorg9865 <54539969+Igorg9865@users.noreply.github.com>
+Date:   Tue Apr 9 23:23:21 2024 +0200
+
+    Initial commit

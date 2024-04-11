@@ -1,7 +1,5 @@
 import math
-from ml-framework.mlops import Sigmoid
-
-
+from mlops import sigmoid, dotproduct
 
 class Layer:
    def __init__(self, inp, num_nodes, bias):
