@@ -1,22 +1,28 @@
 import math
 
-def get_weights(num_weights):
-         weights = []
-         for i in range(num_weights):
-            weights.append(0.1 * i + 0.1)
-         return weights
-
 def sigmoid(x):
    out = 1 / (1 + math.exp(-x))
    return out
 
-class Model:
-   def __init__(self, inputs, num_weights, bias):
-      self.inputs = inputs
-      self.bias = bias
-      self.weights = get_weights(num_weights)
+class Layer:
+   def __init__(self, inp, num_nodes, bias):
+      self.inp = inp
+      self.num_inp = len(inp)
+      self.num_nodes = num_nodes
+      self.bias = bias       
+    #  self.weights = get_weights(self.num_inp, self.num_nodes)
+
+   def get_weights(self):
+      weights = []
+      num_weights = self.num_inp * self.num_nodes
+      for i in range(num_weights):
+         weights.append(0.1 * i + 0.1)
+      return weights
+
+   
+layer1 = Layer([1,2], 2, 0.25)
 
 
 
-nn = Model(inputs = [0.1, 0.5], num_weights=8, bias=[0.25, 0.35])
+
 
