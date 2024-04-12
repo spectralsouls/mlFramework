@@ -1,5 +1,5 @@
 import math
-from mlops import sigmoid, dotproduct
+from mlops import Sigmoid, dotproduct
 
 class Layer:
    def __init__(self, inp, num_nodes, bias):
@@ -35,9 +35,9 @@ class Model:
          else: w2.append(weights[i + 1])
       
       h1 = dotproduct(inp, w1) + layer.bias
-      output1 = sigmoid(h1)
+      output1 = Sigmoid.forward(h1)
       h2 = dotproduct(inp, w2) + layer.bias
-      output2 = sigmoid(h2)
+      output2 = Sigmoid.forward(h2)
       print(output1, output2)
 
 nn = Model()
