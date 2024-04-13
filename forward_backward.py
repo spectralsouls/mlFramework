@@ -1,5 +1,6 @@
 import math
 from mlops import Sigmoid, dotproduct
+from tensor_buffer import Tensor
 
 class Layer:
    def __init__(self, inp, num_nodes, bias):
@@ -17,9 +18,9 @@ class Layer:
 
 class Model:
    def __init__(self):
-      self.layer1 = Layer([0.1, 0.5], 2, 0.25)
+      self.layer1 = Layer(Tensor([0.1, 0.5]).data, 2, 0.25)
       self.weights1 = self.layer1.get_weights()
-      self.layer2 = Layer([1,2], 2, 0.35)
+      self.layer2 = Layer(Tensor([1,2]).data, 2, 0.35)
    
    def forward(self, layer):
       inp = layer.inp
