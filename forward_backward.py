@@ -1,5 +1,5 @@
 import numpy as np
-from mlops import Sigmoid, dotproduct
+from mlops import Sigmoid, new_dotproduct
 from tensor_buffer import Tensor
 
 class Layer:
@@ -35,9 +35,9 @@ class Model:
          if i == 1: w2.append(weights[i])
          else: w2.append(weights[i + 1])
       
-      h1 = dotproduct(inp, w1) + layer.bias
+      h1 = new_dotproduct(inp, w1) + layer.bias
       output1 = Sigmoid.forward(h1)
-      h2 = dotproduct(inp, w2) + layer.bias
+      h2 = new_dotproduct(inp, w2) + layer.bias
       output2 = Sigmoid.forward(h2)
       print(output1, output2)
 
