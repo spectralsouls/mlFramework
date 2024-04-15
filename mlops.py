@@ -7,4 +7,4 @@ class Sigmoid:
       sigma = 1 / (1 + math.exp(-x))
       return sigma * (1 - sigma)
 
-def dotproduct(x,y): return sum(x * y for x,y in zip(a,b)) 
+def dotproduct(a,b): return sum(x * y for x,y in zip(a,b)) 
