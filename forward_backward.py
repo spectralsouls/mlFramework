@@ -1,30 +1,33 @@
 import numpy as np
-from mlops import Sigmoid, new_dotproduct
+from mlops import Sigmoid, dotproduct
 from tensor_buffer import Tensor
 
-class Layer:
-   def __init__(self, inp, num_nodes, bias):
-      self.inp = inp
-      self.num_inp = len(inp)
+class DenseLayer:
+   def __init__(self, num_inp, num_nodes):
+      self.num_inp = num_inp
       self.num_nodes = num_nodes
-      self.bias = bias       
+      self.weights = [] # add random initialization later
+      self.bias = [0]  # should this always start with an initial value of zero?    
+   
+   def forward(self, inp):
+      self.output = dotproduct(inp, self.weights) + self.bias
 
-   def get_weights(self):
-      weights = []
-      num_weights = self.num_inp * self.num_nodes
-      for i in range(num_weights):
-         weights.append(0.1 * i + 0.1)
-      return weights
+fc1 = DenseLayer(2,2)
+fc1.weights.append([0.1,0.2,0.3,0.4])
+
+fc2 = DenseLayer(2,2)
+fc2.weights.append([0.5,0.6,0.7,0.8])
+
 
 class Model:
    def __init__(self):
-      self.layer1 = Layer(Tensor(np.array([0.1, 0.5])).data, 2, 0.25)
-      self.weights1 = self.layer1.get_weights()
-      self.layer2 = Layer(Tensor(np.array([1,2])).data, 2, 0.35)
-   
-   def forward(self, layer):
-      inp = layer.inp
-      weights = layer.get_weights()
+      self.layer1 = fc1
+      self.layer2 = fc2
+
+   def forward(self, inp):
+      out = []
+      out.append(self.layer1.forward(inp))
+      out.append(self.layer2.forward(self.layer1.output))  
 
       w1 = []
       for i in range(0, len(weights) - 2):
@@ -35,9 +38,9 @@ class Model:
          if i == 1: w2.append(weights[i])
          else: w2.append(weights[i + 1])
       
-      h1 = new_dotproduct(inp, w1) + layer.bias
+      h1 = dotproduct(inp, w1) + layer.bias
       output1 = Sigmoid.forward(h1)
-      h2 = new_dotproduct(inp, w2) + layer.bias
+      h2 = dotproduct(inp, w2) + layer.bias
       output2 = Sigmoid.forward(h2)
       print(output1, output2)
 
