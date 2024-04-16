@@ -17,11 +17,3 @@ def dotproduct(a,b):
         out.append(ret)
       return out
    else: return sum(x * y for x,y in zip(a,b))
-
-
-
-a = dotproduct(np.array([0.1,0.5]),np.array(
-      [[0.1, 0.3],
-       [0.2,0.4]]))
-
-print(a)
