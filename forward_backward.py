@@ -7,16 +7,16 @@ class DenseLayer:
       self.num_inp = num_inp
       self.num_nodes = num_nodes
       self.weights = np.empty(shape=(num_inp, num_nodes)) # add random initialization later
-      self.bias = np.array([0])  # should this always start with an initial value of zero?    
+      self.bias = Tensor([0])  # should this always start with an initial value of zero?    
    
    def forward(self, inp):
-      self.output = dotproduct(inp, self.weights) + self.bias
+      self.output = Tensor(dotproduct(inp, self.weights)) + self.bias # --> you shouldnt have to wrap this in a Tensor
 
 fc1 = DenseLayer(2,2)
-fc1.weights = np.array([[0.1, 0.3], [0.2, 0.4]])
+fc1.weights = Tensor([[0.1, 0.3], [0.2, 0.4]])
 
 fc2 = DenseLayer(2,2)
-fc2.weights = np.array([[0.5,0.7],[0.6,0.8]])
+fc2.weights = Tensor([[0.5,0.7],[0.6,0.8]])
 
 class Model:
    def __init__(self):
@@ -29,7 +29,7 @@ class Model:
       return self.layer2.output
 
 
-inp = np.array([0.1, 0.5])
+inp = Tensor([0.1, 0.5])
 nn = Model()
-out =nn.forward(inp)
-print(out)
+out = nn.forward(inp)
+print(out.data)

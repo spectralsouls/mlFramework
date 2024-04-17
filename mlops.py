@@ -1,5 +1,4 @@
 import math
-from tensor_buffer import Tensor
 import numpy as np
 
 class Sigmoid:
