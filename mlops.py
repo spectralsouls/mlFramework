@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 class Sigmoid:
-   def forward(x): return 1/ (1 + math.exp(-x))
+   def forward(x): return 1/ (1 + np.exp(-x))
    def backward(x): 
       sigma = 1 / (1 + math.exp(-x))
       return sigma * (1 - sigma)
