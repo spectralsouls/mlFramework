@@ -1,12 +1,13 @@
 import numpy as np
-from mlops import Sigmoid
+from mlops import Sigmoid, MSE
+
+# This needs to work with batches toos
 
 class DenseLayer:
    def __init__(self, num_inp, num_nodes):
-      self.num_inp = num_inp
-      self.num_nodes = num_nodes
+      self.num_inp, self.num_nodes = num_inp, num_nodes
       self.weights = np.empty(shape=(num_inp, num_nodes))
-      self.bias = np.array([0])
+      self.bias = np.empty([0])
    
    def forward(self, inp):
       self.output = np.dot(self.weights, inp) + self.bias
@@ -34,8 +35,25 @@ class Model:
       out = self.sigmoid.forward(self.layer2.output)
       return out
    
-# THE FORWARD PASS
+   def backward(self, deriv):
+     dact1 = self.sigmoid.backward(deriv)
+     return dact1
+
+
+# FORWARD PASS
 inp = np.array([0.1, 0.5])
+batch_inp = np.random.rand(3,2)
 nn = Model()
-out = nn.forward(inp)
-print(out)
+pred = nn.forward(inp)
+print(pred)
+
+test_val = np.array([0.05, 0.95])
+error = MSE.forward(test_val, pred)
+print(error)
+
+# BACKWARD PASS
+derivatives = 0.73492
+update = nn.backward(derivatives)
+#print(update)
+
+
