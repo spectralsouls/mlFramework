@@ -2,6 +2,7 @@ import numpy as np
 from mlops import Sigmoid, MSE
 
 # This needs to work with batches toos
+# Add a Sigmoid layer
 
 class DenseLayer:
    def __init__(self, num_inp, num_nodes):
@@ -39,9 +40,16 @@ class Model:
       return out
    
    def backward(self, deriv):
-     d_act1 = self.sigmoid.backward(self.layer2.output)
+     d_MSE = MSE.backward(test_val, pred)
+     d_act2 = self.sigmoid.backward(self.layer2.output)
      self.layer2.backward(deriv)
-     return d_act1
+     print(f"d_MSE:{d_MSE}, d_act2: {d_act2}, d_layer2: {self.sigmoid.forward(self.layer1.output)}")
+     d_weight = d_MSE[0] * d_act2[0] * self.sigmoid.forward(self.layer1.output) # self.sigmoid.forward(self.layer1.output) --> should not have to calculate this again during backwards pass
+     print(d_weight)
+     return d_weight
+   
+   def update_weights(self, learning_rate):
+      pass
 
 
 # FORWARD PASS
@@ -59,6 +67,6 @@ d_error = MSE.backward(test_val, pred)
 update = nn.backward(pred)
 print(update)
 
-print(f"pred:{pred}, error:{error}, d_error:{d_error}")
+print(f"pred:{pred}, error:{error}")
 
 
