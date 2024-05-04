@@ -10,14 +10,17 @@ class DenseLayer:
       self.bias = np.empty([0])
    
    def forward(self, inp):
-      self.output = np.dot(self.weights, inp) + self.bias
+      self.output = np.matmul(inp, self.weights) + self.bias #check if a@b is faster than np.matmul(a,b)
+
+   def backward(self, d_inp):
+      pass
 
 fc1 = DenseLayer(2,2)
-fc1.weights = np.array([[0.1, 0.3], [0.2, 0.4]])
+fc1.weights = np.array([[0.1, 0.2], [0.3, 0.4]])
 fc1.bias = np.array([0.25])
 
 fc2 = DenseLayer(2,2)
-fc2.weights = np.array([[0.5,0.6],[0.7,0.8]])
+fc2.weights = np.array([[0.5,0.7],[0.6,0.8]])
 fc2.bias = np.array([0.35])
 
 act = Sigmoid
@@ -36,8 +39,9 @@ class Model:
       return out
    
    def backward(self, deriv):
-     dact1 = self.sigmoid.backward(deriv)
-     return dact1
+     d_act1 = self.sigmoid.backward(self.layer2.output)
+     self.layer2.backward(deriv)
+     return d_act1
 
 
 # FORWARD PASS
@@ -45,15 +49,16 @@ inp = np.array([0.1, 0.5])
 batch_inp = np.random.rand(3,2)
 nn = Model()
 pred = nn.forward(inp)
-print(pred)
 
+# LOSS
 test_val = np.array([0.05, 0.95])
 error = MSE.forward(test_val, pred)
-print(error)
+d_error = MSE.backward(test_val, pred)
 
 # BACKWARD PASS
-derivatives = 0.73492
-update = nn.backward(derivatives)
-#print(update)
+update = nn.backward(pred)
+print(update)
+
+print(f"pred:{pred}, error:{error}, d_error:{d_error}")
 
 

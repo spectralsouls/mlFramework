@@ -12,3 +12,6 @@ class MSE:
       assert len(observed) == len(pred)
       error = np.sum((observed - pred) ** 2 / len(observed))
       return error
+   def backward(observed, pred):
+      deriv = np.negative((observed - pred))
+      return deriv
