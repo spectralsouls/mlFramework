@@ -14,18 +14,15 @@ class DenseLayer:
       self.output = np.matmul(inp, self.weights) + self.bias #check if a@b is faster than np.matmul(a,b)
 
    def backward(self, deriv):
-      self.dinput = (np.ones(shape=self.weights.shape) * deriv).T
-      self.dweights = np.ones(shape=self.weights.shape) * deriv
+      self.dweights = (np.ones(shape=self.weights.shape) * deriv).T
+      self.dinput = np.ones(shape=self.weights.shape) * deriv
 
 fc1 = DenseLayer(2,2)
-fc1.weights = np.array([[0.1, 0.2], [0.3, 0.4]])
-fc1.bias = np.array([0.25])
+fc1.weights, fc1.bias = np.array([[0.1, 0.2], [0.3, 0.4]]), np.array([0.25])
 
 fc2 = DenseLayer(2,2)
-fc2.weights = np.array([[0.5,0.7],[0.6,0.8]])
-fc2.bias = np.array([0.35])
+fc2.weights, fc2.bias = np.array([[0.5,0.7],[0.6,0.8]]), np.array([0.35])
 
-print(fc2.weights.T[0])
 
 class Model:
    def __init__(self):
@@ -44,19 +41,13 @@ class Model:
      d_MSE = MSE.backward(test_val, pred)
      d_act2 = self.sigmoid.backward(self.layer2.output)
      self.layer2.backward(self.sigmoid.forward(self.layer1.output)) # # self.sigmoid.forward(self.layer1.output) --> change this afterwards
-     print(f"d_MSE:{d_MSE}, d_act2: {d_act2}, d_layer2: {self.layer2.dinput}")
-     x = d_MSE * d_act2 * self.layer2.dinput
-    # print(x)
+     x = d_MSE * d_act2 * self.layer2.dweights
+     d_weights2 = MSE.backward(test_val, pred) * self.sigmoid.backward(self.layer2.output) * self.layer2.dweights
+     assert x.all() == d_weights2.all()
      d_act1 = self.sigmoid.backward(self.layer1.output)
-     self.layer2.backward(self.layer2.weights)
-     self.layer1.backward(inp)
-     self.layer2.backward(self.layer2.weights.T[0])
-     print(f"d_act1: {d_act1}, d_layer1: {self.layer1.dinput}, d_layer2: {self.layer2.dweights}")
-     y1 = d_MSE * d_act2 * self.layer2.dinput * d_act1 * self.layer2.dweights * self.layer1.dinput
-     print(f"y1: {y1}")
-     y2 = d_MSE * d_act2 * self.layer2.dinput * d_act1 * self.layer1.dweights
-     y_total = y1 + y2
-     #print(y_total)
+     print(f"d_MSE:{d_MSE}, d_act2: {d_act2}, d_layer2: {self.layer2.dinput}, d_act1:{d_act1}, inp:{inp.T}")
+     y = d_MSE.T * d_act2.T * self.layer2.weights.T * d_act1.T * inp.T   
+     print(y)
    
    def update_weights(self, learning_rate, gradient):
       updated_weights = self.weights - learning_rate * gradient
@@ -64,13 +55,13 @@ class Model:
 
 
 # FORWARD PASS
-inp = np.array([0.1, 0.5])
+inp = np.array([[0.1, 0.5]])
 batch_inp = np.random.rand(3,2)
 nn = Model()
 pred = nn.forward(inp)
 
 # LOSS
-test_val = np.array([0.05, 0.95])
+test_val = np.array([[0.05, 0.95]])
 error = MSE.forward(test_val, pred)
 d_error = MSE.backward(test_val, pred)
 
