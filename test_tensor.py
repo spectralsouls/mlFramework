@@ -1,5 +1,4 @@
 import unittest
-import torch
 from tensor import tensor
 
 # Test data
