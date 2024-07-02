@@ -11,5 +11,10 @@ class TernaryOps(Enum):
     WHERE = auto(); MULACC = auto()
 class ReduceOps(Enum):
     SUM = auto(); MAX = auto()
-
-Op = Union[UnaryOps, BinaryOps, TernaryOps, ReduceOps]
+class LoadOps(Enum):
+    EMPTY = auto(); CONST = auto(); COPY = auto(); CONTIGUOUS = auto() 
+    CUSTOM = auto(); ASSIGN = auto(); VIEW = auto() 
+class BufferOps(Enum):
+    LOAD = auto(); CONST = auto(); STORE = auto()
+    
+Op = Union[UnaryOps, BinaryOps, TernaryOps, ReduceOps, LoadOps, BufferOps]

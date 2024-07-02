@@ -6,7 +6,7 @@ LOG2: log base 2 (x)
 CAST:  
 BITCAST:  
 SIN: sin(x) Note: x needs to be in radians  
-SQRT: \sqrt{x}  
+SQRT: sqrt(x)    
 NEG: x * -1  
 RECIP: 1 / x  
 
@@ -36,7 +36,8 @@ CONST: [] -> [i_1]
 COPY: [] -> [i_1, i_2, i_3]  
 CONTIGUOUS:  
 CUSTOM: [] -> [i_rndm, i_rndm, i_rndm], i_rndm is random   
-
+ASSIGN:  
+VIEW:  
 
 ## BufferOps
 LOAD: 
