@@ -4,11 +4,13 @@ import numpy as np
 # np.frombuffer vs np.array
 
 class Function:
-    def forward(self): raise NotImplementedError(f"forward not implemented for {type(self)}")
+    def forward(self, *args): raise NotImplementedError(f"forward not implemented for {type(self)}")
     def backward(self): raise NotImplementedError(f"backward not implemented for {type(self)}")
 
-    def apply(self, fxn, *x:tensor):
-        pass
+    @classmethod
+    def apply(fxn, x:tensor):
+        ret = fxn.forward(x.data)
+        return ret
 
 
 import functions as F
@@ -22,13 +24,13 @@ class tensor:
     @property
     def numpy(self): return np.array(self.data, self.dtype)
 
+    def exp(self): return F.Exp.apply(self)
+    def log(self): return F.Log.apply(self)
+    def relu(self): return F.Relu.apply(self)
+
     def __getitem__(self, idx): 
         return np.array(self.data)[idx]
     def __repr__(self):
         return f"{self.data}"
 
 
-    def exp(self): return np.exp(self.data)
-    def log(self): return np.log(self.data)
-
-    def relu(self): return F.Relu.forward(self)
