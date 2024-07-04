@@ -6,7 +6,9 @@ class Negative(Function):
     def forward(x): return np.negative(x)
 
 class Reciprocal(Function):
-    def forward(x): return np.reciprocal(x)
+    def forward(x): 
+        x_casted = np.array(x, dtype=np.float32)
+        return np.reciprocal(x_casted)
 
 class Sqrt(Function):
     def forward(x): return np.sqrt(x)
