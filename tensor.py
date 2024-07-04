@@ -24,13 +24,17 @@ class tensor:
     @property
     def numpy(self): return np.array(self.data, self.dtype)
 
+    def negative(self): return F.Negative.apply(self)
+    def reciprocal(self): return F.Reciprocal.apply(self)
+    def sqrt(self): return F.Sqrt.apply(self)
     def exp(self): return F.Exp.apply(self)
     def log(self): return F.Log.apply(self)
+    def sin(self): return F.Sin.apply(self)
     def relu(self): return F.Relu.apply(self)
 
-    def __getitem__(self, idx): 
-        return np.array(self.data)[idx]
     def __repr__(self):
         return f"{self.data}"
+    def __getitem__(self, idx): 
+        return np.array(self.data)[idx]
 
 
