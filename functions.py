@@ -29,3 +29,8 @@ class Sigmoid(Function):
     def forward(x): pass # ----> Compute Sigmoid Function
 
 # Binary Fxns
+class Add(Function):
+    def forward(x, y): return np.add(x,y) 
+
+class Mul(Function):
+    def forward(x, y): return np.multiply(x, y)
