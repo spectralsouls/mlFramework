@@ -16,7 +16,8 @@ import functions as F
 
 def broadcasted(x):
         if not isinstance(x, tensor):
-            return tensor(x)
+            x = tensor(x)
+        return x
 
 class tensor:
     def __init__(self, data, dtype=np.int32):
