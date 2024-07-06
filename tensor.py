@@ -10,7 +10,7 @@ class Function:
     @classmethod
     def apply(fxn, *x:tensor):
         ret = fxn.forward(*[t.data for t in x])
-        return ret
+        return tensor(ret)
 
 import functions as F
 
@@ -25,8 +25,7 @@ class tensor:
         self.shape = np.array(data, dtype).shape
         self.size = () if len(self.shape) == 0 else len(data)
 
-    @property
-    def numpy(self): return np.array(self.data, self.dtype)
+    def numpy(self): return np.array(self.data)
 
     def negative(self): return F.Negative.apply(self)
     def recip(self): return F.Reciprocal.apply(self)
@@ -36,7 +35,7 @@ class tensor:
     def sin(self): return F.Sin.apply(self)
     def relu(self): return F.Relu.apply(self)
 
-    def add(self, x): return F.Add.apply(self, broadcasted(x)) # should add be able to take more than 2 tensors (e.g. a + b + c + ...)
+    def add(self, x): return F.Add.apply(self, broadcasted(x))
     def sub(self, x): return F.Add.apply(self, broadcasted(-x))
     def mul(self, x): return F.Mul.apply(self, broadcasted(x))
     def div(self, x): return F.Mul.apply(self, broadcasted(x).recip())
@@ -45,6 +44,7 @@ class tensor:
         return f"{self.data}"
     def __getitem__(self, idx): 
         return np.array(self.data)[idx]
+    def __neg__(self): return self.negative()
     def __add__(self, x): return self.add(x)
     def __sub__(self, x): return self.sub(x)
     def __mul__(self, x): return self.mul(x)
