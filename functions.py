@@ -26,7 +26,9 @@ class Relu(Function):
     def forward(x): return np.maximum(x, 0)
 
 class Sigmoid(Function):
-    def forward(x): pass # ----> Compute Sigmoid Function
+    def forward(x): 
+        denom = np.add(1, np.exp(np.negative(x)))
+        return np.divide(1, denom)
 
 # Binary Fxns
 class Add(Function):

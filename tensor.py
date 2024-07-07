@@ -34,6 +34,7 @@ class tensor:
     def log(self): return F.Log.apply(self)
     def sin(self): return F.Sin.apply(self)
     def relu(self): return F.Relu.apply(self)
+    def sigmoid(self): return F.Sigmoid.apply(self)
 
     def add(self, x): return F.Add.apply(self, broadcasted(x))
     def sub(self, x): return F.Add.apply(self, broadcasted(-x))

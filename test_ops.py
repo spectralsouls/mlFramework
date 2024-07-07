@@ -37,6 +37,7 @@ class TestUnaryOps(unittest.TestCase):
     def test_log(self): perform_test(default_vals, lambda x: x.log())
     def test_sin(self): perform_test(default_vals, lambda x: x.sin())
     def test_relu(self): perform_test(default_vals, lambda x: x.relu())
+    def test_sigmoid(self): perform_test(default_vals, lambda x: x.sigmoid())
 
 class TestBinaryOps(unittest.TestCase):
     def test_add_constant(self): perform_binop_test(default_vals, test_vals, lambda x,y: x + y)
