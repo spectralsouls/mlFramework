@@ -34,6 +34,8 @@ class Sigmoid(Function):
 class Add(Function):
     def forward(self, x, y): return np.add(x,y) 
 
+    def backward(self, x, y): print("backward pass of add function")
+
 class Sub(Function):
     def forward(self, x, y): return x + -(y)
 

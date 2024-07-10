@@ -42,7 +42,6 @@ class tensor:
     def sin(self): return F.Sin.apply(self)
     def relu(self): return F.Relu.apply(self)
     def sigmoid(self): return F.Sigmoid.apply(self)
-
     def add(self, x): return F.Add.apply(self, broadcasted(x))
     def sub(self, x): return F.Sub.apply(self, broadcasted(x))
     def mul(self, x): return F.Mul.apply(self, broadcasted(x))
@@ -59,4 +58,14 @@ class tensor:
     def __truediv__(self, x): return self.div(x)
 
 
-
+    # depth first search
+    def dfs(self):
+         def walk(node, visited):
+              visited.add(node)
+              if node.ctx is not None:
+                for i in node.ctx.parents:
+                    #if i not in visited: 
+                    yield from walk(i, visited)
+                    visited.add(i)
+              yield node  
+         return list(walk(self, set()))
