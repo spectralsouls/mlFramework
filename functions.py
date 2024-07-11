@@ -34,10 +34,18 @@ class Sigmoid(Function):
 class Add(Function):
     def forward(self, x, y): return np.add(x,y) 
 
-    def backward(self, x, y): print("backward pass of add function")
+    def backward(self, grad): 
+        print("backward pass of ADD function")
+        return 1 * grad
 
 class Sub(Function):
     def forward(self, x, y): return x + -(y)
 
 class Mul(Function):
-    def forward(self, x, y): return np.multiply(x, y)
+    def forward(self, x, y): 
+        self.x, self.y = x, y
+        return np.multiply(x, y)
+    
+    def backward(self, grad):
+        print("backward pass of MUL function")
+        return self.y * grad, self.x * grad
