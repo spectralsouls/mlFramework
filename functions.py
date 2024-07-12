@@ -5,6 +5,8 @@ import numpy as np
 class Negative(Function):
     def forward(self, x): return np.negative(x)
 
+    def backward(self, grad): return -(grad)
+
 class Reciprocal(Function):
     def forward(self, x): 
         x_casted = np.array(x, dtype=np.float32)
@@ -12,6 +14,9 @@ class Reciprocal(Function):
 
 class Sqrt(Function):
     def forward(self, x): return np.sqrt(x)
+
+    def backward(self, grad): 
+        return (1/2) * (1/np.sqrt(grad)) 
 
 class Exp(Function):
     def forward(self, x): return np.exp(x)
@@ -35,8 +40,7 @@ class Add(Function):
     def forward(self, x, y): return np.add(x,y) 
 
     def backward(self, grad): 
-        print("backward pass of ADD function")
-        return 1 * grad
+        return grad, grad
 
 class Sub(Function):
     def forward(self, x, y): return x + -(y)
@@ -47,5 +51,4 @@ class Mul(Function):
         return np.multiply(x, y)
     
     def backward(self, grad):
-        print("backward pass of MUL function")
         return self.y * grad, self.x * grad

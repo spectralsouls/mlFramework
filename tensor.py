@@ -74,11 +74,11 @@ class tensor:
 
     def backwards(self):
         graph = reversed(self.dfs())
-        print(graph)
         self.grad = tensor(1.0) #initial grad of 1
-        print(self.grad)
         for t in graph:
-            new_grads = t.ctx.backward(self.grad.data)
-            print(new_grads)
-            for i,j in zip(t.ctx.parents, new_grads):
-                i.grad = tensor(j)
+                if t.ctx is not None:
+                    new_grads = [tensor(t.ctx.backward(self.grad.data))]
+                    print(new_grads)
+                    for i,j in zip(t.ctx.parents, new_grads):
+                        print(f"i: {i}, j: {j}")
+                        i.grad = j
