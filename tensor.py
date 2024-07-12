@@ -73,6 +73,7 @@ class tensor:
     
 
     def backwards(self):
+        assert self.shape == (), f"tensor must be scalar"
         graph = reversed(self.dfs())
         self.grad = tensor(1.0) #initial grad of 1
         for t in graph:
