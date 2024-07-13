@@ -9,31 +9,57 @@ class Negative(Function):
 
 class Reciprocal(Function):
     def forward(self, x): 
-        x_casted = np.array(x, dtype=np.float32)
-        return np.reciprocal(x_casted)
+        self.x = np.array(x, dtype=np.float32)
+        return np.reciprocal(self.x)
+    
+    def backward(self, grad): return -(self.x**-2) * grad
 
 class Sqrt(Function):
-    def forward(self, x): return np.sqrt(x)
+    def forward(self, x): 
+        self.x = x
+        return np.sqrt(x)
 
     def backward(self, grad): 
-        return (1/2) * (1/np.sqrt(grad)) 
+        return (0.5) * (1/self.x**0.5) * grad
 
 class Exp(Function):
-    def forward(self, x): return np.exp(x)
+    def forward(self, x): 
+        self.ret = np.exp(x)
+        return self.ret
 
-class Log(Function):
-    def forward(self, x): return np.log(x)
+    def backward(self, grad): return self.ret * grad
+
+class Log(Function): # ln(x)
+    def forward(self, x): 
+        self.x = x
+        return np.log(x)
+    
+    def backward(self, grad): return 1/self.x * grad
 
 class Sin(Function):
-    def forward(self, x): return np.sin(x)
+    def forward(self, x): 
+        self.x = x
+        return np.sin(x)
+    
+    def backward(self, grad):
+        return np.cos(self.x) * grad
 
 class Relu(Function):
-    def forward(self, x): return np.maximum(x, 0)
+    def forward(self, x): 
+        self.x = np.maximum(x, 0)
+        return self.x
+
+    def backward(self, grad): 
+        return grad if self.x >= 1 else 0
 
 class Sigmoid(Function):
     def forward(self, x): 
-        denom = np.add(1, np.exp(np.negative(x)))
-        return np.divide(1, denom)
+        denom = np.add(1, np.exp(-x))
+        self.x = np.divide(1, denom)
+        return self.x
+    
+    def backward(self, grad): 
+        return self.x * (1 - self.x) * grad
 
 # Binary Fxns
 class Add(Function):

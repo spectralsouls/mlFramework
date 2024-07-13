@@ -71,7 +71,6 @@ class tensor:
               yield node  
          return list(walk(self, set()))
     
-
     def backwards(self):
         assert self.shape == (), f"tensor must be scalar"
         graph = reversed(self.dfs())
