@@ -78,12 +78,8 @@ class tensor:
         for t in graph:
                 if t.ctx is not None:
                     grads = t.ctx.backward(self.grad.data) #if t.ctx.parents > 0 else None
-                    #print(grads)
-                    new_grads = []
                     if len(t.ctx.parents) > 1:
-                          for g in grads: new_grads.append(tensor(g))
-                    else: new_grads.append(tensor(grads))
-                    #print(new_grads)
+                          new_grads = [tensor(g) for g in grads]
+                    else: new_grads = [tensor(grads)]
                     for t, g in zip(t.ctx.parents, new_grads):
                          t.grad = g
-                         #print(f"t: {t}, g: {g}")
