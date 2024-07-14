@@ -71,6 +71,9 @@ class Add(Function):
 class Sub(Function):
     def forward(self, x, y): return x + -(y)
 
+    def backward(self, grad): 
+        return grad, -grad
+
 class Mul(Function):
     def forward(self, x, y): 
         self.x, self.y = x, y
@@ -78,3 +81,11 @@ class Mul(Function):
     
     def backward(self, grad):
         return self.y * grad, self.x * grad
+    
+class Div(Function):
+    def forward(self, x, y):
+        self.x, self.y = x, y
+        return np.divide(x, y)
+    
+    def backward(self, grad):
+        return (1/self.y) * grad, (-self.x*self.y**-2) * grad

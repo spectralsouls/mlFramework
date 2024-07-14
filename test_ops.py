@@ -6,8 +6,9 @@ from tensor import tensor
 
 # make a FORWARD_ONLY env variable
 #default_vals = [-1,0,2]
-test_vals = [-1,0,2]
+#test_vals = [-1,0,2]
 default_vals = 2.0
+test_vals = 3.0
 
 
 def prepare_tensors(val, forward_only):
@@ -29,13 +30,19 @@ def perform_test(val, torch_fxn, native_fxn=None, forward_only=False):
         np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
 
 
-def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None):
+def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_only=False):
     if native_fxn == None: native_fxn = torch_fxn
-    pytorch_tensor, native_tensor = prepare_tensors(load_vals)
-    torch_test_vals, native_test_vals = torch.tensor(test_vals), tensor(test_vals)
+    pytorch_tensor, native_tensor = prepare_tensors(load_vals, forward_only)
+    torch_test_vals, native_test_vals = prepare_tensors(test_vals, forward_only)
     torch_result, native_result = torch_fxn(pytorch_tensor, torch_test_vals), native_fxn(native_tensor, native_test_vals)
    # print(f"Result: {torch_result}")
-    np.testing.assert_allclose(torch_result.numpy(), native_result.numpy())
+    np.testing.assert_allclose(torch_result.detach().numpy(), native_result.numpy())
+
+    if not forward_only:
+        torch_result.backward(), native_result.backwards()
+        np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
+        np.testing.assert_allclose(torch_test_vals.grad.numpy(), native_test_vals.grad.numpy())
+        
 
 
 
@@ -48,10 +55,9 @@ class TestUnaryOps(unittest.TestCase):
     def test_sin(self): perform_test(default_vals, lambda x: x.sin())
     def test_relu(self): perform_test(default_vals, lambda x: x.relu())
     def test_sigmoid(self): perform_test(default_vals, lambda x: x.sigmoid()) 
-    # sigmoid test fails because pytorch tensor is float32, and the native tensor is float64
 
 class TestBinaryOps(unittest.TestCase):
-    def test_add_constant(self): perform_binop_test(default_vals, test_vals, lambda x,y: x + y)
+    def test_add(self): perform_binop_test(default_vals, test_vals, lambda x,y: x + y)
     def test_sub(self): perform_binop_test(default_vals, test_vals, lambda x,y: x - y)
     def test_mul(self): perform_binop_test(default_vals, test_vals, lambda x,y: x * y)
     def test_div(self): perform_binop_test(default_vals, test_vals, lambda x,y: x / y)

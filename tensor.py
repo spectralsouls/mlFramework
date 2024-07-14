@@ -47,7 +47,7 @@ class tensor:
     def add(self, x): return F.Add.apply(self, broadcasted(x))
     def sub(self, x): return F.Sub.apply(self, broadcasted(x))
     def mul(self, x): return F.Mul.apply(self, broadcasted(x))
-    def div(self, x): return F.Mul.apply(self, broadcasted(x).recip()) # should there be a Div function?
+    def div(self, x): return F.Div.apply(self, broadcasted(x))
 
     def __repr__(self):
         return f"tensor({self.data})"
@@ -77,8 +77,13 @@ class tensor:
         self.grad = tensor(1.0) #initial grad of 1
         for t in graph:
                 if t.ctx is not None:
-                    new_grads = [tensor(t.ctx.backward(self.grad.data))]
-                    print(new_grads)
-                    for i,j in zip(t.ctx.parents, new_grads):
-                        print(f"i: {i}, j: {j}")
-                        i.grad = j
+                    grads = t.ctx.backward(self.grad.data) #if t.ctx.parents > 0 else None
+                    #print(grads)
+                    new_grads = []
+                    if len(t.ctx.parents) > 1:
+                          for g in grads: new_grads.append(tensor(g))
+                    else: new_grads.append(tensor(grads))
+                    #print(new_grads)
+                    for t, g in zip(t.ctx.parents, new_grads):
+                         t.grad = g
+                         #print(f"t: {t}, g: {g}")
