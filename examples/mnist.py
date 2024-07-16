@@ -4,9 +4,15 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 import torch.optim as optim
 import functools
+import itertools
 
+transform = transforms.Compose([transforms.ToTensor])
+train_mnist = datasets.MNIST('../data', train=True, download=True, transform=transform)
+test_mnist = datasets.MNIST('../data', train=False, download=True, transform=transform)
 
-torch.manual_seed(42)
+def transform_x(mnist):
+    x = mnist.data
+    return x.unsqueeze(1).float()
 
 def sequential(inp, layers):
     return functools.reduce(lambda x,f: f(x), layers, inp)
@@ -24,16 +30,35 @@ class Model(nn.Module):
             lambda x: torch.flatten(x, start_dim=1), nn.Linear(576, 10)
                       ]
                  
+    def get_parameters(self):
+        layers = [layer for layer in self.layers if isinstance(layer, nn.Module)]
+        params = [layer.parameters() for layer in layers]
+        p = itertools.chain(*params)
+        return p
+
     def __call__(self, x): return sequential(x, self.layers)
 
+if __name__ == "__main__":
+    x_train, x_test = transform_x(train_mnist), transform_x(test_mnist)
+    y_train, y_test = train_mnist.targets, test_mnist.targets
+
 model = Model()
-#adam = optim.Adam(model.parameters)
+adam = optim.Adam(model.get_parameters())
 
 def train_step(bs=512):
-    #adam.zero_grad()
+    adam.zero_grad()
     samples = torch.randint(low=0, high=60000, size=(bs,)) 
-    loss = F.cross_entropy(model(x_train[samples].float()), y_train[samples])#.backward()
-    print(f"loss: {loss: 4.2f}")
+    loss = F.cross_entropy(model(x_train[samples].float()), y_train[samples])#cant do .backward() here
+    loss_val = loss 
     loss.backward()
-    #adam.step()
+    adam.step()
+    return loss_val
     
+def calc_acc(): return torch.sum((model(x_test).argmax(axis=1) == y_test) / len(y_test))*100
+    
+for i in range(23):
+    loss = train_step()
+    if i%10 == 9:
+        acc = calc_acc()
+        print(f"loss: {loss: 4.2f}, accuracy: {acc: 4.2f}% ")
+
