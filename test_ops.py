@@ -29,7 +29,6 @@ def perform_test(val, torch_fxn, native_fxn=None, forward_only=False):
         #print(pytorch_tensor.grad, native_tensor.grad)
         np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
 
-
 def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_only=False):
     if native_fxn == None: native_fxn = torch_fxn
     pytorch_tensor, native_tensor = prepare_tensors(load_vals, forward_only)
@@ -43,8 +42,6 @@ def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_
         np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
         np.testing.assert_allclose(torch_test_vals.grad.numpy(), native_test_vals.grad.numpy())
         
-
-
 
 class TestUnaryOps(unittest.TestCase):
     def test_neg(self): perform_test(default_vals, lambda x: x.negative())

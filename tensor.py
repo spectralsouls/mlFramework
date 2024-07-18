@@ -77,7 +77,7 @@ class tensor:
         self.grad = tensor(1.0) #initial grad of 1
         for t in graph:
                 if t.ctx is not None:
-                    grads = t.ctx.backward(self.grad.data) #if t.ctx.parents > 0 else None
+                    grads = t.ctx.backward(self.grad.data)
                     if len(t.ctx.parents) > 1:
                           new_grads = [tensor(g) for g in grads]
                     else: new_grads = [tensor(grads)]
