@@ -60,5 +60,8 @@ class TestBinaryOps(unittest.TestCase):
     def test_div(self): perform_binop_test(default_vals, test_vals, lambda x,y: x / y)
 
 
+class TestMovementOps(unittest.TestCase):
+    def test_reshape(self): pass
+
 if __name__ == '__main__':
     unittest.main()

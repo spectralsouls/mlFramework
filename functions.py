@@ -89,3 +89,8 @@ class Div(Function):
     
     def backward(self, grad):
         return (1/self.y) * grad, (-self.x*self.y**-2) * grad
+    
+
+# Movement Fxns
+class Reshape(Function):
+    def forward(self, x, shape:tuple): return np.reshape(x, shape)

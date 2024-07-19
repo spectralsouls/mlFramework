@@ -11,9 +11,9 @@ class Function:
     def backward(self, *args): raise NotImplementedError(f"backward not implemented for {type(self)}")
 
     @classmethod
-    def apply(fxn:Function, *x:tensor) -> tensor:
-        ctx = fxn(*x)
-        ret = tensor(ctx.forward(*[t.data for t in x]))
+    def apply(fxn:Function, *x:tensor, **kwargs) -> tensor:
+        ctx = fxn(*x,)
+        ret = tensor(ctx.forward(*[t.data for t in x], **kwargs))
         ret.ctx = ctx
         return ret
 
@@ -44,15 +44,22 @@ class tensor:
     def relu(self): return F.Relu.apply(self)
     def sigmoid(self): return F.Sigmoid.apply(self)
 
-    def add(self, x): return F.Add.apply(self, broadcasted(x))
-    def sub(self, x): return F.Sub.apply(self, broadcasted(x))
-    def mul(self, x): return F.Mul.apply(self, broadcasted(x))
-    def div(self, x): return F.Div.apply(self, broadcasted(x))
+    def add(self, y): return F.Add.apply(self, broadcasted(y))
+    def sub(self, y): return F.Sub.apply(self, broadcasted(y))
+    def mul(self, y): return F.Mul.apply(self, broadcasted(y))
+    def div(self, y): return F.Div.apply(self, broadcasted(y))
 
-    def __repr__(self):
-        return f"tensor({self.data})"
+     # needs to be refactored
+    def reshape(self, newshape, *args): 
+         shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
+         if args is not None: shape += tuple(a if isinstance(a, int) else a[0] for a in args) 
+         return F.Reshape.apply(self, shape=shape)
+
+    def __repr__(self): 
+         return f"tensor({self.data})"
     def __getitem__(self, idx): 
-        return np.array(self.data)[idx]
+         return np.array(self.data)[idx]
+    
     def __neg__(self): return self.negative()
     def __add__(self, x): return self.add(x)
     def __sub__(self, x): return self.sub(x)
@@ -65,7 +72,6 @@ class tensor:
               visited.add(node)
               if node.ctx is not None:
                 for i in node.ctx.parents:
-                    #if i not in visited: 
                     yield from walk(i, visited)
                     visited.add(i)
               yield node  
