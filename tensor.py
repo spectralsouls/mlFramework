@@ -49,11 +49,18 @@ class tensor:
     def mul(self, y): return F.Mul.apply(self, broadcasted(y))
     def div(self, y): return F.Div.apply(self, broadcasted(y))
 
-     # needs to be refactored
+     # possibly refactor later
     def reshape(self, newshape, *args): 
          shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
-         if args is not None: shape += tuple(a if isinstance(a, int) else a[0] for a in args) 
+         if args is not None: shape += tuple(a for a in args)
          return F.Reshape.apply(self, shape=shape)
+    
+    def transpose(self): return F.Transpose.apply(self)
+    def flip(self, axis=None): return F.Flip.apply(self, axis)
+    def pad(self, width, mode='constant', **kwargs): 
+         return F.Pad.apply(self, width=width, mode=mode, **kwargs)
+    def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
+    def expand(self, axis): return F.Expand.apply(self, axis=axis)
 
     def __repr__(self): 
          return f"tensor({self.data})"

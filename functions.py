@@ -93,4 +93,25 @@ class Div(Function):
 
 # Movement Fxns
 class Reshape(Function):
-    def forward(self, x, shape:tuple): return np.reshape(x, shape)
+    def forward(self, x, shape): 
+        return np.reshape(x, shape)
+
+class Transpose(Function):
+    def forward(self, x): 
+        return np.transpose(x)
+
+class Flip(Function): 
+    def forward(self, x, axis):
+        return np.flip(x, axis)
+
+class Pad(Function):
+    def forward(self, x, width, mode, **kwargs):
+        return np.pad(x, width, mode, **kwargs)
+
+class Shrink(Function):
+    def forward(self, x, axis):
+        return np.squeeze(x, axis)
+
+class Expand(Function):
+    def forward(self, x, axis):
+        return np.expand_dims(x, axis)
