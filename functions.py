@@ -115,3 +115,8 @@ class Shrink(Function):
 class Expand(Function):
     def forward(self, x, axis):
         return np.expand_dims(x, axis)
+    
+# Reduce Fxns
+class Sum(Function):
+    def forward(self, x, axis):
+        return np.sum(x, axis)

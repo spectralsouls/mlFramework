@@ -49,6 +49,9 @@ class tensor:
     def mul(self, y): return F.Mul.apply(self, broadcasted(y))
     def div(self, y): return F.Div.apply(self, broadcasted(y))
 
+    def sum(self, axis=0): 
+         return F.Sum.apply(self, axis=axis)
+
      # possibly refactor later
     def reshape(self, newshape, *args): 
          shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
@@ -61,6 +64,12 @@ class tensor:
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
     def expand(self, axis): return F.Expand.apply(self, axis=axis)
+
+    def linear(self, weights:tensor, bias=None):
+         out = (self * weights.transpose())
+         out = out.sum(axis=1)
+         return out + bias if bias is not None else out
+
 
     def __repr__(self): 
          return f"tensor({self.data})"
