@@ -2,6 +2,8 @@ from __future__ import annotations
 import numpy as np
 from typing import Union, List, Tuple
 
+# **** all fxns involving shapes need to work with ints and tuples as paramaters ****
+
 # np.frombuffer vs np.array
 class Function:
     def __init__(self, *x:tensor):
@@ -52,7 +54,6 @@ class tensor:
     def sum(self, axis=0): 
          return F.Sum.apply(self, axis=axis)
 
-     # possibly refactor later
     def reshape(self, newshape, *args): 
          shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
          if args is not None: shape += tuple(a for a in args)
@@ -66,7 +67,7 @@ class tensor:
     def expand(self, axis): return F.Expand.apply(self, axis=axis)
 
     @staticmethod
-    def random(*shape:int): return np.random.random_sample(size=shape)
+    def random(*shape): return tensor(np.random.random_sample(size=shape)) # TODO: make random work with tuples too
     def linear(self, weights:tensor, bias=None):
          out = (self * weights.transpose()).sum(axis=1)
          return out + bias if bias is not None else out
