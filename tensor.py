@@ -65,9 +65,10 @@ class tensor:
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
     def expand(self, axis): return F.Expand.apply(self, axis=axis)
 
+    @staticmethod
+    def random(*shape:int): return np.random.random_sample(size=shape)
     def linear(self, weights:tensor, bias=None):
-         out = (self * weights.transpose())
-         out = out.sum(axis=1)
+         out = (self * weights.transpose()).sum(axis=1)
          return out + bias if bias is not None else out
 
 
