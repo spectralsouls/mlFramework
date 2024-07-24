@@ -12,22 +12,26 @@ test_vals = 3.0
 
 
 def prepare_tensors(val, forward_only):
-    pytorch = torch.tensor(data=val, requires_grad=(not forward_only), dtype=torch.float64) # should change to float32 later
-    native = tensor(data=val)
+    pytorch = [torch.tensor(data=v, requires_grad=(not forward_only), dtype=torch.float64) for v in val] # should change to float32 later
+    native = [tensor(data=v) for v in val]
     return pytorch, native
+
+def compare(torch, native):
+    #print(f"torch:{torch}, native:{native}")
+    np.testing.assert_allclose(torch.numpy(), native.numpy())
 
 def perform_test(val, torch_fxn, native_fxn=None, forward_only=False):
     if native_fxn == None: native_fxn = torch_fxn
     pytorch_tensor, native_tensor = prepare_tensors(val, forward_only)
-    torch_result, native_result = torch_fxn(pytorch_tensor), native_fxn(native_tensor)
+    torch_result, native_result = torch_fxn(*pytorch_tensor), native_fxn(*native_tensor)
     #print(f"Result: {torch_result}")
-    np.testing.assert_allclose(torch_result.detach().numpy(), native_result.numpy())
+    compare(torch_result.detach(), native_result)
 
     if not forward_only:
         #print("BACKWARD_PASS")
         torch_result.backward(), native_result.backwards()
-        #print(pytorch_tensor.grad, native_tensor.grad)
-        np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
+        for p, n in zip(pytorch_tensor, native_tensor):
+            compare(p.grad.detach(), n.grad)
 
 def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_only=False):
     if native_fxn == None: native_fxn = torch_fxn
@@ -35,29 +39,29 @@ def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_
     torch_test_vals, native_test_vals = prepare_tensors(test_vals, forward_only)
     torch_result, native_result = torch_fxn(pytorch_tensor, torch_test_vals), native_fxn(native_tensor, native_test_vals)
    # print(f"Result: {torch_result}")
-    np.testing.assert_allclose(torch_result.detach().numpy(), native_result.numpy())
+    compare(torch_result.detach(), native_result)
 
     if not forward_only:
         torch_result.backward(), native_result.backwards()
-        np.testing.assert_allclose(pytorch_tensor.grad.numpy(), native_tensor.grad.numpy())
-        np.testing.assert_allclose(torch_test_vals.grad.numpy(), native_test_vals.grad.numpy())
+        compare(pytorch_tensor.grad, native_tensor.grad)
+        compare(torch_test_vals.grad, native_test_vals.grad)
         
 
 class TestUnaryOps(unittest.TestCase):
-    def test_neg(self): perform_test(default_vals, lambda x: x.negative())
-    def test_recip(self): perform_test(default_vals, torch.reciprocal, tensor.recip) # Runtime warning
-    def test_sqrt(self): perform_test(default_vals, lambda x: x.sqrt()) # Runtime warning
-    def test_exp(self): perform_test(default_vals, lambda x: x.exp())
-    def test_log(self): perform_test(default_vals, lambda x: x.log())
-    def test_sin(self): perform_test(default_vals, lambda x: x.sin())
-    def test_relu(self): perform_test(default_vals, lambda x: x.relu())
-    def test_sigmoid(self): perform_test(default_vals, lambda x: x.sigmoid()) 
+    def test_neg(self): perform_test([default_vals], lambda x: x.negative())
+    def test_recip(self): perform_test([default_vals], torch.reciprocal, tensor.recip) # Runtime warning
+    def test_sqrt(self): perform_test([default_vals], lambda x: x.sqrt()) # Runtime warning
+    def test_exp(self): perform_test([default_vals], lambda x: x.exp())
+    def test_log(self): perform_test([default_vals], lambda x: x.log())
+    def test_sin(self): perform_test([default_vals], lambda x: x.sin())
+    def test_relu(self): perform_test([default_vals], lambda x: x.relu())
+    def test_sigmoid(self): perform_test([default_vals], lambda x: x.sigmoid()) 
 
 class TestBinaryOps(unittest.TestCase):
-    def test_add(self): perform_binop_test(default_vals, test_vals, lambda x,y: x + y)
-    def test_sub(self): perform_binop_test(default_vals, test_vals, lambda x,y: x - y)
-    def test_mul(self): perform_binop_test(default_vals, test_vals, lambda x,y: x * y)
-    def test_div(self): perform_binop_test(default_vals, test_vals, lambda x,y: x / y)
+    def test_add(self): perform_test([default_vals, test_vals], lambda x,y: x + y)
+    def test_sub(self): perform_test([default_vals, test_vals], lambda x,y: x - y)
+    def test_mul(self): perform_test([default_vals, test_vals], lambda x,y: x * y)
+    def test_div(self): perform_test([default_vals, test_vals], lambda x,y: x / y)
 
 
 class TestMovementOps(unittest.TestCase):
