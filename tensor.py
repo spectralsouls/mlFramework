@@ -26,10 +26,14 @@ def broadcasted(x) -> tensor:
             x = tensor(x)
         return x
 
+def to_native(x:np.ndarray):
+     buffer = x.f
+
 class tensor:
     def __init__(self, data:Union[List, Tuple], dtype=np.int32): # data takes constants too
         self.ctx = None
         self.grad = None
+        self.data = [list(d for d in data)] if isinstance(data, np.ndarray) else data
         self.data, self.dtype = data, dtype
         self.shape = np.array(data, dtype).shape
         self.size = () if len(self.shape) == 0 else len(data)
