@@ -87,6 +87,7 @@ class Div(Function):
         self.x, self.y = x, y
         return np.divide(x, y)
     
+    #TODO: these will still calculate the grad for tensors with requires_grad=True
     def backward(self, grad):
         return (1/self.y) * grad, (-self.x*self.y**-2) * grad
     

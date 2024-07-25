@@ -8,7 +8,9 @@ import functools
 # np.frombuffer vs np.array
 class Function:
     def __init__(self, *x:tensor):
-         self.parents = x
+         self.needs_grad = [t.requires_grad for t in x]
+         self.requires_grad = True if any(self.needs_grad) else False
+         if self.requires_grad: self.parents = x
 
     def forward(self, *args): raise NotImplementedError(f"forward not implemented for {type(self)}")
     def backward(self, *args): raise NotImplementedError(f"backward not implemented for {type(self)}")
@@ -17,7 +19,8 @@ class Function:
     def apply(fxn:Function, *x:tensor, **kwargs) -> tensor:
         ctx = fxn(*x,)
         ret = tensor(ctx.forward(*[t.data for t in x], **kwargs))
-        ret.ctx = ctx
+        ret.requires_grad = ctx.requires_grad
+        ret.ctx,= ctx if ctx.requires_grad else None,
         return ret
 
 import functions as F
@@ -28,16 +31,16 @@ def broadcasted(x) -> tensor:
         return x
 
 class tensor:
-    def __init__(self, data:Union[List, Tuple], dtype=np.int32): # data takes constants too
-        self.ctx = None
-        self.grad = None
+    def __init__(self, data:Union[List, Tuple], dtype=np.int32, requires_grad=False): # data takes constants too
+        self.ctx, self.grad = None, None
+        self.requires_grad = requires_grad
         self.data = [list(d for d in data)] if isinstance(data, np.ndarray) else data
         self.data, self.dtype = data, dtype
         self.shape = np.array(data, dtype).shape
-        self.size = () if len(self.shape) == 0 else len(data)
+        #self.size = () if len(self.shape) == 0 else len(data)
 
-    
     def numpy(self): return np.array(self.data)
+
      # unary ops
     def negative(self): return F.Negative.apply(self)
     def recip(self): return F.Reciprocal.apply(self)
@@ -110,13 +113,11 @@ class tensor:
     
     def backwards(self):
         assert self.shape == (), f"tensor must be scalar"
-        graph = reversed(self.dfs())
-        self.grad = tensor(1.0) #initial grad of 1
-        for t in graph:
+        self.grad = tensor(1.0, requires_grad=False) #initial grad of 1
+        for t in reversed(self.dfs()):
                 if t.ctx is not None:
-                    grads = t.ctx.backward(self.grad.data)
-                    if len(t.ctx.parents) > 1:
-                          new_grads = [tensor(g) for g in grads]
-                    else: new_grads = [tensor(grads)]
+                    grads = t.ctx.backward(t.grad.data)
+                    new_grads = [tensor(g) for g in grads] if len(t.ctx.parents) > 1 else [tensor(grads)]
                     for t, g in zip(t.ctx.parents, new_grads):
-                         t.grad = g
+                         if t.requires_grad:
+                              t.grad = g if t.grad is None else (tensor(t.grad) + g) #t.grad + g, t.grad needs to broadcast
