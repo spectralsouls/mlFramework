@@ -119,4 +119,8 @@ class Expand(Function):
 # Reduce Fxns
 class Sum(Function):
     def forward(self, x, axis):
+        self.input_shape = np.array(x).shape
         return np.sum(x, axis)
+    
+    def backward(self, grad):
+        return grad * np.ones(shape=self.input_shape)

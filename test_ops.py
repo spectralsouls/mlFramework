@@ -11,44 +11,34 @@ default_vals = 2.0
 test_vals = 3.0
 
 
-def prepare_tensors(val, forward_only):
-    pytorch = [torch.tensor(data=v, requires_grad=(not forward_only), dtype=torch.float64) for v in val] # should change to float32 later
-    native = [tensor(data=v) for v in val]
+def prepare_tensors(shape, forward_only):
+    np.random.seed(0)
+    data = [np.random.uniform(size=s) for s in shape]
+    pytorch = [torch.tensor(data=d, requires_grad=(not forward_only), dtype=torch.float64) for d in data] # should change to float32 later
+    native = [tensor(data=d.detach().numpy()) for d in pytorch]
     return pytorch, native
 
 def compare(torch, native):
     #print(f"torch:{torch}, native:{native}")
     np.testing.assert_allclose(torch.numpy(), native.numpy())
 
-def perform_test(val, torch_fxn, native_fxn=None, forward_only=False):
+def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
     if native_fxn == None: native_fxn = torch_fxn
-    pytorch_tensor, native_tensor = prepare_tensors(val, forward_only)
+    pytorch_tensor, native_tensor = prepare_tensors(shape, forward_only)
     torch_result, native_result = torch_fxn(*pytorch_tensor), native_fxn(*native_tensor)
     #print(f"Result: {torch_result}")
     compare(torch_result.detach(), native_result)
 
     if not forward_only:
-        #print("BACKWARD_PASS")
         torch_result.backward(), native_result.backwards()
         for p, n in zip(pytorch_tensor, native_tensor):
             compare(p.grad.detach(), n.grad)
 
-def perform_binop_test(load_vals,test_vals, torch_fxn, native_fxn=None, forward_only=False):
-    if native_fxn == None: native_fxn = torch_fxn
-    pytorch_tensor, native_tensor = prepare_tensors(load_vals, forward_only)
-    torch_test_vals, native_test_vals = prepare_tensors(test_vals, forward_only)
-    torch_result, native_result = torch_fxn(pytorch_tensor, torch_test_vals), native_fxn(native_tensor, native_test_vals)
-   # print(f"Result: {torch_result}")
-    compare(torch_result.detach(), native_result)
-
-    if not forward_only:
-        torch_result.backward(), native_result.backwards()
-        compare(pytorch_tensor.grad, native_tensor.grad)
-        compare(torch_test_vals.grad, native_test_vals.grad)
-        
-
 class TestUnaryOps(unittest.TestCase):
-    def test_neg(self): perform_test([default_vals], lambda x: x.negative())
+    def test_neg(self): 
+        perform_test([(4,5)], lambda x: -x)
+        perform_test([(4,5)], lambda x: x.negative())
+        perform_test([()], lambda x: x.negative())
     def test_recip(self): perform_test([default_vals], torch.reciprocal, tensor.recip) # Runtime warning
     def test_sqrt(self): perform_test([default_vals], lambda x: x.sqrt()) # Runtime warning
     def test_exp(self): perform_test([default_vals], lambda x: x.exp())

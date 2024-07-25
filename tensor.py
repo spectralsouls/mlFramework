@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
 from typing import Union, List, Tuple
+import functools
 
 # **** all fxns involving shapes need to work with ints and tuples as paramaters ****
 
@@ -26,9 +27,6 @@ def broadcasted(x) -> tensor:
             x = tensor(x)
         return x
 
-def to_native(x:np.ndarray):
-     buffer = x.f
-
 class tensor:
     def __init__(self, data:Union[List, Tuple], dtype=np.int32): # data takes constants too
         self.ctx = None
@@ -40,7 +38,7 @@ class tensor:
 
     
     def numpy(self): return np.array(self.data)
-
+     # unary ops
     def negative(self): return F.Negative.apply(self)
     def recip(self): return F.Reciprocal.apply(self)
     def sqrt(self): return F.Sqrt.apply(self)
@@ -49,32 +47,43 @@ class tensor:
     def sin(self): return F.Sin.apply(self)
     def relu(self): return F.Relu.apply(self)
     def sigmoid(self): return F.Sigmoid.apply(self)
-
+     # binary ops
     def add(self, y): return F.Add.apply(self, broadcasted(y))
     def sub(self, y): return F.Sub.apply(self, broadcasted(y))
     def mul(self, y): return F.Mul.apply(self, broadcasted(y))
     def div(self, y): return F.Div.apply(self, broadcasted(y))
 
-    def sum(self, axis=0): 
-         return F.Sum.apply(self, axis=axis)
-
+     # movement ops
     def reshape(self, newshape, *args): 
          shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
          if args is not None: shape += tuple(a for a in args)
          return F.Reshape.apply(self, shape=shape)
     
     def transpose(self): return F.Transpose.apply(self)
-    def flip(self, axis=None): return F.Flip.apply(self, axis)
+    def flip(self, axis=None): return F.Flip.apply(self, axis) #doesnt seem to work
     def pad(self, width, mode='constant', **kwargs): 
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
     def expand(self, axis): return F.Expand.apply(self, axis=axis)
 
+     # reduce ops
+    def sum(self, axis=None): 
+          return F.Sum.apply(self, axis=axis)
+
+
     @staticmethod
     def random(*shape): return tensor(np.random.random_sample(size=shape)) # TODO: make random work with tuples too
+
+    # ml ops
     def linear(self, weights:tensor, bias=None):
          out = (self * weights.transpose()).sum(axis=1)
          return out + bias if bias is not None else out
+    # backwards pass of linear is most likely wrong
+
+    def mean(self, axis=None): # backwards pass seems to be incorrect native gives grad: 1, pytorch gives grad: 1 / denom
+         num = self.sum()
+         denom = functools.reduce(lambda x, y: x * y, self.shape)
+         return num.div(denom)
 
 
     def __repr__(self): 
