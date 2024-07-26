@@ -115,11 +115,12 @@ class tensor:
               yield node  
          return list(walk(self, set()))
     
+    
     def backwards(self):
-        assert self.shape == (), f"tensor must be scalar"
-        self.grad = tensor(1.0, requires_grad=False) #initial grad of 1
-        for t in reversed(self.dfs()):
-                if t.ctx is not None:
+     assert self.shape == (), f"tensor must be scalar"
+     self.grad = tensor(1.0, requires_grad=False) #initial grad of 1
+     for t in reversed(self.dfs()):
+               if t.ctx is not None:
                     grads = t.ctx.backward(t.grad.data)
                     new_grads = [tensor(g) for g in grads] if len(t.ctx.parents) > 1 else [tensor(grads)]
                     for t, g in zip(t.ctx.parents, new_grads):

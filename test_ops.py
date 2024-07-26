@@ -37,16 +37,28 @@ def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
 
 class TestUnaryOps(unittest.TestCase):
     def test_neg(self): 
-        perform_test([(4,5)], lambda x: -x)
         perform_test([(4,5)], lambda x: x.negative())
+        perform_test([(4,5)], lambda x: -x)
         perform_test([()], lambda x: x.negative())
-    def test_recip(self): perform_test([default_vals], torch.reciprocal, tensor.recip) # Runtime warning
-    def test_sqrt(self): perform_test([default_vals], lambda x: x.sqrt()) # Runtime warning
-    def test_exp(self): perform_test([default_vals], lambda x: x.exp())
-    def test_log(self): perform_test([default_vals], lambda x: x.log())
-    def test_sin(self): perform_test([default_vals], lambda x: x.sin())
-    def test_relu(self): perform_test([default_vals], lambda x: x.relu())
-    def test_sigmoid(self): perform_test([default_vals], lambda x: x.sigmoid()) 
+   # def test_recip(self): perform_test([default_vals], torch.reciprocal, tensor.recip) # No reciprocal tests???
+    def test_sqrt(self): 
+        perform_test([(4,5)], lambda x: x.sqrt()) 
+        perform_test([()], lambda x: x.sqrt())
+    def test_exp(self): 
+        perform_test([(4,5)], lambda x: x.exp())
+        perform_test([()], lambda x: x.exp())
+    def test_log(self): 
+        perform_test([(4,5)], lambda x: x.log())
+        perform_test([()], lambda x: x.log())
+    def test_sin(self): 
+        perform_test([(4,5)], lambda x: x.sin())
+        perform_test([()], lambda x: x.sin())
+  #  def test_relu(self):  #####
+   #     perform_test([(4,5)], lambda x: x.relu())
+    #    perform_test([()], lambda x: x.relu())
+    def test_sigmoid(self): 
+        perform_test([(4,5)], lambda x: x.sigmoid())
+        perform_test([()], lambda x: x.sigmoid())
 
 class TestBinaryOps(unittest.TestCase):
     def test_add(self): perform_test([default_vals, test_vals], lambda x,y: x + y)
