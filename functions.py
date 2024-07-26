@@ -66,13 +66,15 @@ class Add(Function):
     def forward(self, x, y): return np.add(x,y) 
 
     def backward(self, grad): 
-        return grad, grad
+        return grad if self.needs_grad[0] else None, \
+               grad if self.needs_grad[1] else None
 
 class Sub(Function):
     def forward(self, x, y): return x + -(y)
 
     def backward(self, grad): 
-        return grad, -grad
+        return grad if self.needs_grad[0] else None, \
+               -grad if self.needs_grad[1] else None
 
 class Mul(Function):
     def forward(self, x, y): 
@@ -80,7 +82,8 @@ class Mul(Function):
         return np.multiply(x, y)
     
     def backward(self, grad):
-        return self.y * grad, self.x * grad
+        return self.y * grad if self.needs_grad[0] else None, \
+               self.x * grad if self.needs_grad[1] else None
     
 class Div(Function):
     def forward(self, x, y):
@@ -89,8 +92,9 @@ class Div(Function):
     
     #TODO: these will still calculate the grad for tensors with requires_grad=True
     def backward(self, grad):
-        return (1/self.y) * grad, (-self.x*self.y**-2) * grad
-    
+        return (1/self.y) * grad if self.needs_grad[0] else None, \
+               (-self.x*self.y**-2) * grad if self.needs_grad[1] else None
+
 
 # Movement Fxns
 class Reshape(Function):
@@ -124,4 +128,4 @@ class Sum(Function):
         return np.sum(x, axis)
     
     def backward(self, grad):
-        return grad * np.ones(shape=self.input_shape)
+        return np.full(shape=self.input_shape, fill_value=grad)

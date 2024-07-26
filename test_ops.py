@@ -70,7 +70,7 @@ class TestBinaryOps(unittest.TestCase):
         perform_test([(4,5), (4,5)], lambda x,y: x - y)
         perform_test([(), ()], lambda x,y: x - y)        
     def test_mul(self): 
-        perform_test([(4,5), (4,5)], lambda x,y: x * y, tensor.mul)
+        perform_test([(2), (2)], lambda x,y: x * y, tensor.mul)
         perform_test([(4,5), (4,5)], lambda x,y: x * y)
         perform_test([(), ()], lambda x,y: x * y)
     def test_div(self): 
