@@ -15,11 +15,12 @@ def prepare_tensors(shape, forward_only):
     np.random.seed(0)
     data = [np.random.uniform(size=s) for s in shape]
     pytorch = [torch.tensor(data=d, requires_grad=(not forward_only), dtype=torch.float64) for d in data] # should change to float32 later
-    native = [tensor(data=d.detach().numpy()) for d in pytorch]
+    native = [tensor(data=d.detach().numpy(), requires_grad=(not forward_only)) for d in pytorch]
     return pytorch, native
 
-def compare(torch, native):
+def compare(msg, torch, native):
     #print(f"torch:{torch}, native:{native}")
+    print(msg)
     np.testing.assert_allclose(torch.numpy(), native.numpy())
 
 def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
@@ -27,12 +28,12 @@ def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
     pytorch_tensor, native_tensor = prepare_tensors(shape, forward_only)
     torch_result, native_result = torch_fxn(*pytorch_tensor), native_fxn(*native_tensor)
     #print(f"Result: {torch_result}")
-    compare(torch_result.detach(), native_result)
+    compare("FORWARD", torch_result.detach(), native_result)
 
     if not forward_only:
-        torch_result.backward(), native_result.backwards()
+        torch_result.mean().backward(), native_result.mean().backwards() # TODO: x.square().mean().backwards() doesnt work
         for p, n in zip(pytorch_tensor, native_tensor):
-            compare(p.grad.detach(), n.grad)
+            compare("BACKWARD", p.grad.detach(), n.grad)
 
 class TestUnaryOps(unittest.TestCase):
     def test_neg(self): 

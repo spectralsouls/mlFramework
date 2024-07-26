@@ -34,7 +34,9 @@ class tensor:
     def __init__(self, data:Union[List, Tuple], dtype=np.int32, requires_grad=False): # data takes constants too
         self.ctx, self.grad = None, None
         self.requires_grad = requires_grad
-        self.data = [list(d for d in data)] if isinstance(data, np.ndarray) else data
+        if isinstance(data, np.ndarray): 
+             self.data = [list(d for d in data)] if len(data.shape) > 0 else data.item() #for scalar arrays
+        else: self.data = data
         self.data, self.dtype = data, dtype
         self.shape = np.array(data, dtype).shape
         #self.size = () if len(self.shape) == 0 else len(data)
@@ -85,8 +87,10 @@ class tensor:
 
     def mean(self, axis=None): # backwards pass seems to be incorrect native gives grad: 1, pytorch gives grad: 1 / denom
          num = self.sum()
-         denom = functools.reduce(lambda x, y: x * y, self.shape)
+         denom = functools.reduce(lambda x, y: x * y, self.shape) if len(self.shape) > 0 else 1
          return num.div(denom)
+    
+    def square(self): return self * self
 
 
     def __repr__(self): 
@@ -120,4 +124,5 @@ class tensor:
                     new_grads = [tensor(g) for g in grads] if len(t.ctx.parents) > 1 else [tensor(grads)]
                     for t, g in zip(t.ctx.parents, new_grads):
                          if t.requires_grad:
-                              t.grad = g if t.grad is None else (tensor(t.grad) + g) #t.grad + g, t.grad needs to broadcast
+                              t.grad = g  if t.grad is None else (t.grad + g)
+
