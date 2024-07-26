@@ -61,10 +61,22 @@ class TestUnaryOps(unittest.TestCase):
         perform_test([()], lambda x: x.sigmoid())
 
 class TestBinaryOps(unittest.TestCase):
-    def test_add(self): perform_test([default_vals, test_vals], lambda x,y: x + y)
-    def test_sub(self): perform_test([default_vals, test_vals], lambda x,y: x - y)
-    def test_mul(self): perform_test([default_vals, test_vals], lambda x,y: x * y)
-    def test_div(self): perform_test([default_vals, test_vals], lambda x,y: x / y)
+    def test_add(self): 
+        perform_test([(4,5), (4,5)], lambda x,y: x + y, tensor.add) # check this one 
+        perform_test([(4,5), (4,5)], lambda x,y: x + y)
+        perform_test([(), ()], lambda x,y: x + y)        
+    def test_sub(self): 
+        perform_test([(4,5), (4,5)], lambda x,y: x - y, tensor.sub)
+        perform_test([(4,5), (4,5)], lambda x,y: x - y)
+        perform_test([(), ()], lambda x,y: x - y)        
+    def test_mul(self): 
+        perform_test([(4,5), (4,5)], lambda x,y: x * y, tensor.mul)
+        perform_test([(4,5), (4,5)], lambda x,y: x * y)
+        perform_test([(), ()], lambda x,y: x * y)
+    def test_div(self): 
+        perform_test([(4,5), (4,5)], lambda x,y: x / y, tensor.div)
+        perform_test([(4,5), (4,5)], lambda x,y: x / y)
+        perform_test([(), ()], lambda x,y: x / y)
 
 
 class TestMovementOps(unittest.TestCase):
