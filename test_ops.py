@@ -53,9 +53,9 @@ class TestUnaryOps(unittest.TestCase):
     def test_sin(self): 
         perform_test([(4,5)], lambda x: x.sin())
         perform_test([()], lambda x: x.sin())
-  #  def test_relu(self):  #####
-   #     perform_test([(4,5)], lambda x: x.relu())
-    #    perform_test([()], lambda x: x.relu())
+    def test_relu(self):  #####
+        perform_test([(4,5)], lambda x: x.relu()) 
+        perform_test([()], lambda x: x.relu())
     def test_sigmoid(self): 
         perform_test([(4,5)], lambda x: x.sigmoid())
         perform_test([()], lambda x: x.sigmoid())

@@ -50,7 +50,7 @@ class Relu(Function):
         return self.x
 
     def backward(self, grad): 
-        return grad if self.x >= 1 else 0
+        return np.where(self.x >= 0, grad, self.x)
 
 class Sigmoid(Function):
     def forward(self, x): 
