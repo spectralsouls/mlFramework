@@ -99,7 +99,11 @@ class Div(Function):
 # Movement Fxns
 class Reshape(Function):
     def forward(self, x, shape): 
+        self.input_shape = x.shape
         return np.reshape(x, shape)
+    
+    def backward(self, grad): 
+        return np.reshape(grad, self.input_shape) 
 
 class Transpose(Function):
     def forward(self, x): 

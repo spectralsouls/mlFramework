@@ -80,7 +80,15 @@ class TestBinaryOps(unittest.TestCase):
 
 
 class TestMovementOps(unittest.TestCase):
-    def test_reshape(self): pass
+    def test_reshape(self):
+        perform_test([(4,3,6,6)], lambda x: x.reshape((12,6,6)))
+        perform_test([(4,3,6,6)], lambda x: x.reshape((-1,3,6,6)))
+        perform_test([()], lambda x: x.reshape(()))
+        perform_test([(1,)], lambda x: x.reshape(()))
+        perform_test([()], lambda x: x.reshape((1,)))
+        perform_test([()], lambda x: x.reshape((1,1,1)))
+       
+
 
 if __name__ == '__main__':
     unittest.main()
