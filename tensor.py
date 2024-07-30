@@ -31,7 +31,7 @@ def broadcasted(x) -> tensor:
         return x
 
 class tensor:
-    def __init__(self, data:Union[List, Tuple], dtype=np.int32, requires_grad=False): # data takes constants too
+    def __init__(self, data:Union[List, np.ndarray, int, float], dtype=np.int32, requires_grad:bool=None): # data takes constants too
         self.ctx, self.grad = None, None
         self.requires_grad = requires_grad
         if isinstance(data, np.ndarray): 
