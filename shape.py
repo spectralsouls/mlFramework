@@ -2,6 +2,7 @@ from typing import Tuple
 from dataclasses import dataclass
 import itertools, operator
 
+#TODO: insert this error from pytorch (maybe): IndexError: Dimension out of range (expected to be in range of [-2, 1], but got 2)
 
 def get_strides(shape:Tuple[int, ...]) -> Tuple[int, ...]:
     strides = tuple(itertools.accumulate(reversed(shape[1:]), operator.mul, initial=1))[::-1]
@@ -25,12 +26,21 @@ class View:
         assert sorted(dims) == list(range(len(self.shape))), \
         f"dimensions don't match the desired ordering: {list(range(len(self.shape)))} != {sorted(dims)}"
         return View.create(tuple(self.shape[d] for d in dims), tuple(self.stride[d] for d in dims))
+    
+    def pad(self, dims): # and all((b>=0 and e >=0) for b,e in dims)    
+        assert len(self.shape) == len(dims), f"input dimensions don't match pad dimensions: {self.shape} != {dims}"
+        assert all(d >= 0 for d in dims), f"pad dimensions must be non-negative:{dims}"
+        new_shape = tuple(s + d for s,d in zip(self.shape, dims))
+        return View.create(new_shape, self.stride)
+
+    def shrink(self, dims):
+        pass
 
     def expand(self, dims):
         assert len(self.shape) == len(dims), \
         f"number of dimensions doesn't match length of desired dimensions: {len(self.shape)} != {len(dims)}"
         assert all(s == d or (s == 1 and st == 0) for s,d,st in zip(self.shape, dims, self.stride)), \
-        f"expanded size {d for d in dims} must match the singleton dimension {s for s in shapes}"
+        f"expanded size {dims} must match the singleton dimension {self.shapes}"
         return View.create(shape=dims)
     
 @dataclass
