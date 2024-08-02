@@ -2,7 +2,7 @@ import unittest
 import torch
 import torch.nn.functional as F
 import numpy as np
-from tensor import tensor
+from MLF.tensor import tensor
 
 
 # make a FORWARD_ONLY env variable
@@ -88,8 +88,10 @@ class TestMovementOps(unittest.TestCase):
         perform_test([(1,)], lambda x: x.reshape(()))
         perform_test([()], lambda x: x.reshape((1,)))
         perform_test([()], lambda x: x.reshape((1,1,1)))
-    def test_pad(self):
-       
+    def test_permute(self):
+        perform_test([(1,2,3,4)], lambda x: x.permute((3,0,2,1)))     
+        perform_test([(3,4,5,6)], lambda x: x.permute((3,2,1,0)))  
+        perform_test([()], lambda x: x.permute(()))  
 
 
 if __name__ == '__main__':

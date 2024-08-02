@@ -25,10 +25,6 @@ class Function:
 
 import functions as F
 
-class Storage:
-     def __init__(self, size:int, dtype:np.dtype):
-          self.size = size
-
 def broadcasted(x) -> tensor:
         if not isinstance(x, tensor):
             x = tensor(x)
@@ -73,7 +69,7 @@ class tensor:
     def pad(self, width, mode='constant', **kwargs): 
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
-    def expand(self, axis): return F.Expand.apply(self, axis=axis)
+    def expand(self, shape): return F.Expand.apply(self, shape=shape)
 
      # reduce ops
     def sum(self, axis=None): 

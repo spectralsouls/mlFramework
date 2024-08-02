@@ -6,7 +6,7 @@ from memory import Buffer
 
 # A Buffer is a tensor without gradients
 class LazyBuffer:
-    def __init__(self, shape:Tuple[int, ...], dtype:np.dtype, base:Optional[Storage]=None):
+    def __init__(self, shape:Tuple[int, ...], dtype:np.dtype, base:Optional[Buffer]=None):
         self.shape, self.dtype = shape, dtype
         self.size = functools.reduce(lambda x,y: x * y, self.shape)
         if base is None:
@@ -16,4 +16,4 @@ class LazyBuffer:
             self.base = base
 
     def __repr__(self): 
-        return f"<LazyBuffer: shape {self.shape}, dtype{self.dtype}"
+        return f"<LazyBuffer: shape: {self.shape}, dtype: {self.dtype}"

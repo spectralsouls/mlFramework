@@ -105,9 +105,13 @@ class Reshape(Function):
     def backward(self, grad): 
         return np.reshape(grad, self.input_shape) 
 
-class Transpose(Function): # change to permute
-    def forward(self, x): 
-        return np.transpose(x)
+class Permute(Function):
+    def forward(self, x, axis): 
+        self.input_axis = axis
+        return np.permute_dims(x, axis)
+    
+    def backward(self, grad):
+        return np.permute_dims(grad, sorted(self.input_axis))
 
 class Flip(Function): 
     def forward(self, x, axis):
@@ -122,8 +126,8 @@ class Shrink(Function):
         return np.squeeze(x, axis)
 
 class Expand(Function):
-    def forward(self, x, axis):
-        return np.expand_dims(x, axis)
+    def forward(self, x, shape):
+        return np.broadcast_to(x, shape)
     
 # Reduce Fxns
 class Sum(Function):
