@@ -1,5 +1,6 @@
 import unittest
 import torch
+import torch.nn.functional as F
 import numpy as np
 from tensor import tensor
 
@@ -87,6 +88,7 @@ class TestMovementOps(unittest.TestCase):
         perform_test([(1,)], lambda x: x.reshape(()))
         perform_test([()], lambda x: x.reshape((1,)))
         perform_test([()], lambda x: x.reshape((1,1,1)))
+    def test_pad(self):
        
 
 

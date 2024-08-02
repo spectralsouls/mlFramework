@@ -42,8 +42,4 @@ class View:
         assert all(s == d or (s == 1 and st == 0) for s,d,st in zip(self.shape, dims, self.stride)), \
         f"expanded size {dims} must match the singleton dimension {self.shapes}"
         return View.create(shape=dims)
-    
-@dataclass
-class ShapeTracker:
-    views: Tuple[View, ...]
-    
+

@@ -105,7 +105,7 @@ class Reshape(Function):
     def backward(self, grad): 
         return np.reshape(grad, self.input_shape) 
 
-class Transpose(Function):
+class Transpose(Function): # change to permute
     def forward(self, x): 
         return np.transpose(x)
 

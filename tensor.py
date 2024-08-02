@@ -25,6 +25,10 @@ class Function:
 
 import functions as F
 
+class Storage:
+     def __init__(self, size:int, dtype:np.dtype):
+          self.size = size
+
 def broadcasted(x) -> tensor:
         if not isinstance(x, tensor):
             x = tensor(x)
