@@ -2,7 +2,8 @@ import unittest
 import torch
 import torch.nn.functional as F
 import numpy as np
-from MLF.tensor import tensor
+from mlf.tensor import tensor
+
 
 
 # make a FORWARD_ONLY env variable

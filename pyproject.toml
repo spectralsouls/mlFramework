@@ -1,0 +1,21 @@
+[project]
+name = "mlf"
+version = "0.0.1"
+description = "mlFramework"
+readme = "README.md"
+dependencies = [
+    "numpy"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+packages = [
+    "mlf", "mlf.other"
+]
+
+[project.urls]
+Homepage = "https://github.com/spectralsouls/mlf"

@@ -23,7 +23,7 @@ class Function:
         ret.ctx,= ctx if ctx.requires_grad else None,
         return ret
 
-import functions as F
+import mlf.functions as F
 
 def broadcasted(x) -> tensor:
         if not isinstance(x, tensor):

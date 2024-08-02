@@ -1,4 +1,4 @@
-from tensor import Function
+from mlf.tensor import Function
 import numpy as np
 
 # Unary Fxns
