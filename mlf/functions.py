@@ -110,8 +110,8 @@ class Permute(Function):
         self.input_axis = axis
         return np.permute_dims(x, axis)
     
-    def backward(self, grad):
-        return np.permute_dims(grad, sorted(self.input_axis))
+    def backward(self, grad): # how does np.argsort work?
+        return np.permute_dims(grad, np.argsort(self.input_axis))
 
 class Flip(Function): 
     def forward(self, x, axis):

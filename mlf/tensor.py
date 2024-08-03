@@ -64,7 +64,7 @@ class tensor:
          if args is not None: shape += tuple(a for a in args)
          return F.Reshape.apply(self, shape=shape)
     
-    def transpose(self): return F.Transpose.apply(self)
+    def permute(self, axis): return F.Permute.apply(self, axis=axis)
     def flip(self, axis=None): return F.Flip.apply(self, axis) #doesnt seem to work
     def pad(self, width, mode='constant', **kwargs): 
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
