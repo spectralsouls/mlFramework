@@ -93,6 +93,14 @@ class TestMovementOps(unittest.TestCase):
         perform_test([(1,2,3,4)], lambda x: x.permute((3,0,2,1)))     
         perform_test([(3,4,5,6)], lambda x: x.permute((3,2,1,0)))  
         perform_test([()], lambda x: x.permute(()))  
+    def test_expand(self):
+        perform_test([(4,3,1,6)], lambda x: x.expand((4,3,2,6)))
+        perform_test([(1,1,1,1)], lambda x: x.expand((4,3,2,6)))
+        perform_test([(4,3,1,6)], lambda x: x.expand((6,1,4,3,2,6)))
+        #perform_test([(4,3,1,6)], lambda x: x.expand((0,1,4,3,2,6)))
+        #perform_test([(4,3,1,6)], lambda x: x.expand((4,3,0,6)))
+        perform_test([()], lambda x: x.expand((4,3,2,6)))
+        perform_test([()], lambda x: x.expand([]))
 
 
 if __name__ == '__main__':

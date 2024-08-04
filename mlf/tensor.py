@@ -59,6 +59,7 @@ class tensor:
     def div(self, y): return F.Div.apply(self, broadcasted(y))
 
      # movement ops
+     # all of these need to convert data to a np.ndarray class and should also automatically turn parameter ints into tuples
     def reshape(self, newshape, *args): 
          shape = tuple((newshape,)) if isinstance(newshape, int) else tuple(newshape)
          if args is not None: shape += tuple(a for a in args)
@@ -69,11 +70,16 @@ class tensor:
     def pad(self, width, mode='constant', **kwargs): 
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
-    def expand(self, shape): return F.Expand.apply(self, shape=shape)
+    def expand(self, newshape:Tuple[int, ...]):   
+         if len(self.shape) < len(newshape):
+              padded_shape = tuple(1 for _ in range(len(newshape) - len(self.shape))) + self.shape
+              padded = self.reshape(padded_shape)
+         else: padded = self
+         return F.Expand.apply(padded, newshape=newshape)
 
      # reduce ops
-    def sum(self, axis=None): 
-          return F.Sum.apply(self, axis=axis)
+    def sum(self, axis=None, keepdims=False): 
+          return F.Sum.apply(self, axis=axis, keepdims=keepdims)
 
 
     @staticmethod
