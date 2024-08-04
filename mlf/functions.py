@@ -115,7 +115,11 @@ class Permute(Function):
 
 class Flip(Function): 
     def forward(self, x, axis):
+        self.axis = axis
         return np.flip(x, axis)
+    
+    def backward(self, grad):
+        return np.flip(grad, axis=self.axis)
 
 class Pad(Function):
     def forward(self, x, width, mode, **kwargs):
@@ -125,12 +129,9 @@ class Shrink(Function):
     def forward(self, x, axis):
         return np.squeeze(x, axis)
 
-# is it possible to expand more than 1 axis in a single expand operation?
 class Expand(Function):
     def forward(self, x:np.ndarray, newshape) -> np.ndarray:
-        print(x.shape)
         self.axis = tuple(i for i, (s1,s2) in enumerate(zip(x.shape, newshape)) if s1 != s2)
-        print(self.axis)
         return np.broadcast_to(x, newshape)
     
     def backward(self, grad):

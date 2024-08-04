@@ -4,6 +4,7 @@ from typing import Union, List, Tuple
 import functools
 
 # **** all fxns involving shapes need to work with ints and tuples as paramaters ****
+#              *** make -1 as a parameter work for the movement ops ***
 
 # np.frombuffer vs np.array
 class Function:
@@ -66,7 +67,7 @@ class tensor:
          return F.Reshape.apply(self, shape=shape)
     
     def permute(self, axis): return F.Permute.apply(self, axis=axis)
-    def flip(self, axis=None): return F.Flip.apply(self, axis) #doesnt seem to work
+    def flip(self, axis=0): return F.Flip.apply(self, axis=axis)
     def pad(self, width, mode='constant', **kwargs): 
          return F.Pad.apply(self, width=width, mode=mode, **kwargs)
     def shrink(self, axis=None): return F.Shrink.apply(self, axis=axis)
@@ -91,7 +92,7 @@ class tensor:
          return out + bias if bias is not None else out
     # backwards pass of linear is most likely wrong
 
-    def mean(self, axis=None): # backwards pass seems to be incorrect native gives grad: 1, pytorch gives grad: 1 / denom
+    def mean(self): # backwards pass seems to be incorrect native gives grad: 1, pytorch gives grad: 1 / denom
          num = self.sum()
          denom = functools.reduce(lambda x, y: x * y, self.shape) if len(self.shape) > 0 else 1
          return num.div(denom)
