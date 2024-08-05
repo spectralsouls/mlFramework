@@ -35,9 +35,10 @@ class tensor:
     def __init__(self, data:Union[List, np.ndarray, int, float], dtype=np.int32, requires_grad:bool=False): # data takes constants too
         self.ctx, self.grad = None, None
         self.requires_grad = requires_grad
-        if isinstance(data, np.ndarray): 
-             self.data = [list(d for d in data)] if len(data.shape) > 0 else data.item() #for scalar arrays
-        else: self.data = data
+        # tensor class is the higher level api that the user uses, ndarrays will for now be the lower level abstraction
+        if not isinstance(data, np.ndarray): 
+             data = np.array(data) 
+        self.data = [list(d for d in data)] if len(data.shape) > 0 else data.item() #for scalar arrays
         self.data, self.dtype = data, dtype
         self.shape = np.array(data, dtype).shape
         #self.size = () if len(self.shape) == 0 else len(data)
@@ -92,7 +93,7 @@ class tensor:
          return out + bias if bias is not None else out
     # backwards pass of linear is most likely wrong
 
-    def mean(self): # backwards pass seems to be incorrect native gives grad: 1, pytorch gives grad: 1 / denom
+    def mean(self):
          num = self.sum()
          denom = functools.reduce(lambda x, y: x * y, self.shape) if len(self.shape) > 0 else 1
          return num.div(denom)
