@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from mlf.tensor import tensor
+import math
 
 
 
@@ -118,6 +119,15 @@ class TestMovementOps(unittest.TestCase):
         perform_test([()], lambda x: x.flip(()))
         perform_test([(1)], lambda x: x.flip(()))
         perform_test([(4,3,6,6)], lambda x: x.flip(()))
+    def test_pad(self):
+        print("***PAD***")
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (1,2,3,4)), lambda x: x.pad(((3,4), (1,2))))
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (1,2,3,4), value=5), lambda x: x.pad(((3,4), (1,2)), constant_values=5))
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (1,2,3,4), value=math.inf), lambda x: x.pad(((3,4), (1,2)), constant_values=math.inf)) #Runtime Warning
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (1,2,3,4), value=-math.inf), lambda x: x.pad(((3,4), (1,2)), constant_values=-math.inf)) #Runtime Warning
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (0,0,3,4), value=1), lambda x: x.pad(((3,4), (0,0)), constant_values=1))
+        perform_test([(3,3)], lambda x: torch.nn.functional.pad(x, (0,0,0,0), value=1), lambda x: x.pad(((0,0), (0,0)), constant_values=1))
+
     def test_expand(self):
         print("***EXPAND***")
         perform_test([(4,3,1,6)], lambda x: x.expand((4,3,2,6)))

@@ -123,11 +123,16 @@ class Flip(Function):
 
 class Pad(Function):
     def forward(self, x, width, mode, **kwargs):
+        self.originals = tuple((p[0], s + p[0]) for p, s in zip(width, x.shape)) 
         return np.pad(x, width, mode, **kwargs)
+    
+    def backward(self, grad):
+        slices = tuple(slice(i[0], i[1]) for i in self.originals)
+        return grad[slices]
 
 class Shrink(Function):
     def forward(self, x, axis):
-        return np.squeeze(x, axis)
+        return np.squeeze(x, axis) # incorrect
 
 class Expand(Function):
     def forward(self, x:np.ndarray, newshape) -> np.ndarray:
