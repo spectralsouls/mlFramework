@@ -6,6 +6,7 @@ import math
 
 # make a FORWARD_ONLY env variable
 
+
 def prepare_tensors(shape, forward_only):
     np.random.seed(0)
     data = [np.random.uniform(size=s) for s in shape]
@@ -15,10 +16,12 @@ def prepare_tensors(shape, forward_only):
     native = [tensor(data=d.detach().numpy(), requires_grad=(not forward_only)) for d in pytorch]
     return pytorch, native
 
+
 def compare(msg, torch, native):
     # print(f"torch:{torch}, native:{native}")
     print(msg)
     np.testing.assert_allclose(torch.numpy(), native.numpy())
+
 
 def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
     native_fxn = torch_fxn if native_fxn is None else native_fxn
@@ -28,9 +31,9 @@ def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
     compare("FORWARD", torch_result.detach(), native_result)
     if not forward_only:
         (
-            torch_result.mean().backward(),
-            native_result.mean().backwards(),
-        )  # TODO: x.square().mean().backwards() doesnt work
+            torch_result.square().mean().backward(),
+            native_result.square().mean().backwards(),
+        )
         for p, n in zip(pytorch_tensor, native_tensor):
             compare("BACKWARD", p.grad.detach(), n.grad)
 

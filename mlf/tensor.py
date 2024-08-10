@@ -143,7 +143,7 @@ class tensor:
         return self * self
 
     def __repr__(self):
-        return f"tensor({self.data})"  # TODO: make a better __repr__
+        return f"tensor({self.data}, dtype={self.dtype})"  # TODO: make a better __repr__
 
     def __getitem__(self, idx):
         return np.array(self.data)[idx]
@@ -169,8 +169,9 @@ class tensor:
             visited.add(node)
             if node.ctx is not None:
                 for i in node.ctx.parents:
-                    yield from walk(i, visited)
-                    visited.add(i)
+                    if i not in visited:
+                        yield from walk(i, visited)
+                        visited.add(i)
             yield node
 
         return list(walk(self, set()))
