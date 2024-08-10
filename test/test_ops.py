@@ -73,6 +73,7 @@ class TestUnaryOps(unittest.TestCase):
         print("***RELU***")
         perform_test([(4, 5)], lambda x: x.relu())
         perform_test([()], lambda x: x.relu())
+        perform_test([(1,2)], lambda x: x.relu(), vals=[[1,2,-3,-4,5,0]])
 
     def test_sigmoid(self):
         print("***SIGMOID***")

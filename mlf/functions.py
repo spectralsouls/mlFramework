@@ -28,6 +28,7 @@ class Sqrt(Function):  # needs to handle negative numbers
         return np.sqrt(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
+
         return (0.5) * (1 / self.x**0.5) * grad
 
 
@@ -60,11 +61,11 @@ class Sin(Function):
 
 class Relu(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        self.x = np.maximum(x, 0)
-        return self.x
+        self.x = x
+        return np.maximum(self.x, 0)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
-        return np.where(self.x >= 0, grad, self.x)
+        return np.where(self.x > 0, grad, 0)
 
 
 class Sigmoid(Function):
