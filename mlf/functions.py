@@ -171,7 +171,15 @@ class Expand(Function):
 class Sum(Function):
     def forward(self, x: np.ndarray, axis, keepdims) -> np.ndarray:
         self.input_shape = np.array(x).shape
+        self.axis = axis if axis is not None else (0,)
         return np.sum(x, axis, keepdims=keepdims)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
-        return np.broadcast_to(grad, self.input_shape)
+        # this stuff needs to be moved later
+        if len(grad.shape) != 0:
+            pad = tuple(1 for _ in range(len(self.input_shape)))
+            padded_shape = tuple(self.input_shape[i] if i not in self.axis else pad[i] for i in range(len(pad)))
+            reshaped = grad.reshape(padded_shape)
+        else:
+            reshaped = grad
+        return np.broadcast_to(reshaped, self.input_shape)

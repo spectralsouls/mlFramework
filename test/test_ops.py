@@ -7,9 +7,9 @@ import math
 # make a FORWARD_ONLY env variable
 
 
-def prepare_tensors(shape, forward_only):
+def prepare_tensors(shape, forward_only, vals):
     np.random.seed(0)
-    data = [np.random.uniform(size=s) for s in shape]
+    data = vals if vals is not None else [np.random.uniform(size=s) for s in shape]
     pytorch = [
         torch.tensor(data=d, requires_grad=(not forward_only), dtype=torch.float64) for d in data
     ]  # should change to float32 later
@@ -23,9 +23,9 @@ def compare(msg, torch, native):
     np.testing.assert_allclose(torch.numpy(), native.numpy())
 
 
-def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False):
+def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False, vals=None):
     native_fxn = torch_fxn if native_fxn is None else native_fxn
-    pytorch_tensor, native_tensor = prepare_tensors(shape, forward_only)
+    pytorch_tensor, native_tensor = prepare_tensors(shape, forward_only, vals)
     torch_result, native_result = torch_fxn(*pytorch_tensor), native_fxn(*native_tensor)
     # print(f"Result: {torch_result}")
     compare("FORWARD", torch_result.detach(), native_result)
@@ -50,6 +50,7 @@ class TestUnaryOps(unittest.TestCase):
         print("***SQUARE ROOT***")
         perform_test([(4, 5)], lambda x: x.sqrt())
         perform_test([()], lambda x: x.sqrt())
+        # perform_test([()], lambda x: x.sqrt(), vals=[-1])
 
     def test_exp(self):
         print("***e^x***")
@@ -60,6 +61,8 @@ class TestUnaryOps(unittest.TestCase):
         print("***ln(x)***")
         perform_test([(4, 5)], lambda x: x.log())
         perform_test([()], lambda x: x.log())
+        # perform_test([()], lambda x: x.log(), vals=[0])
+        # perform_test([()], lambda x: x.log(), vals=[-1])
 
     def test_sin(self):
         print("***SINE***")
@@ -101,6 +104,7 @@ class TestBinaryOps(unittest.TestCase):
         perform_test([(4, 5), (4, 5)], lambda x, y: x / y, tensor.div)
         perform_test([(4, 5), (4, 5)], lambda x, y: x / y)
         perform_test([(), ()], lambda x, y: x / y)
+        # perform_test([(), ()], lambda x, y: x / y, vals=[1, 0])
 
 
 class TestMovementOps(unittest.TestCase):
@@ -175,8 +179,15 @@ class TestMovementOps(unittest.TestCase):
 class TestReduceOps(unittest.TestCase):
     def test_sum(self):
         perform_test([(45, 3)], lambda x: x.sum())
-        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=3))
-        # perform_test([(3,4,5,6)], lambda x: x.sum(axis=(1,3)))
+        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=(3,)))
+        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=(1, 3)))
+        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=(0, 2)))
+        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=(1, 2)))
+        perform_test([(3, 4, 5, 6)], lambda x: x.sum(axis=(1,)))
+        perform_test([()], lambda x: x.sum())
+        perform_test([()], lambda x: x.sum(0))
+        perform_test([()], lambda x: x.sum(-1))
+        perform_test([()], lambda x: x.sum(()))
 
 
 if __name__ == "__main__":
