@@ -25,6 +25,8 @@ class Function:
         ctx = fxn(
             *x,
         )
+        # t.data.data for t in x if isinstance(t.data, tensor) else t.data # remove this line later
+        # data = [t.data for t in x] if not isinstance(t.data, tensor) else [t.data for t in x]
         ret = tensor(ctx.forward(*[t.data for t in x], **kwargs))
         ret.requires_grad = ctx.requires_grad
         (ret.ctx,) = (ctx if ctx.requires_grad else None,)
@@ -49,8 +51,11 @@ class tensor:
             data = np.array(data)
         self.data = [list(d for d in data)] if len(data.shape) > 0 else data.item()  # for scalar arrays
         self.data, self.dtype = data, dtype
-        self.shape = np.array(data, dtype).shape
         # self.size = () if len(self.shape) == 0 else len(data)
+
+    @property
+    def shape(self):
+        return np.array(self.data, self.dtype).shape
 
     def numpy(self):
         return np.array(self.data)
@@ -121,17 +126,21 @@ class tensor:
         print(padded)
         return F.Expand.apply(padded, newshape=newshape)
 
+    def transpose(self):
+        order = tuple(sorted((i for i, _ in enumerate(self.shape)), reverse=True))
+        return self.permute(order)
+
     # reduce ops
     def sum(self, axis=None, keepdims=False):
         return F.Sum.apply(self, axis=axis, keepdims=keepdims)
 
     @staticmethod
-    def random(shape: tuple):
-        return tensor(np.random.uniform(size=shape))  # TODO: make random work with tuples too
+    def random(shape: tuple, requires_grad=False):
+        return tensor(np.random.uniform(size=shape), requires_grad=requires_grad)
 
     # ml ops
     def linear(self, weights: tensor, bias=None):  # backwards pass of linear is most likely wrong
-        out = (self * weights.transpose()).sum(axis=1)
+        out = self * weights.transpose()  # .sum(axis=1)
         return out + bias if bias is not None else out
 
     def mean(self):
@@ -178,6 +187,8 @@ class tensor:
 
     def backwards(self):
         assert self.shape == (), "tensor must be scalar"
+
+        # implicit gradient creation
         self.grad = tensor(1.0, requires_grad=False)  # initial grad of 1 for the tensor that you called .backwards() on
         for t in reversed(self.dfs()):
             if t.ctx is not None:

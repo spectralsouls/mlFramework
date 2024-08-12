@@ -28,7 +28,6 @@ class Sqrt(Function):  # needs to handle negative numbers
         return np.sqrt(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
-
         return (0.5) * (1 / self.x**0.5) * grad
 
 
