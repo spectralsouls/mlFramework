@@ -1,19 +1,21 @@
 import numpy as np
-from typing import Tuple, Optional
-import functools
-from memory import Buffer
+from typing import Tuple, Union
 
 
 # A Buffer is a tensor without gradients
-class LazyBuffer:
-    def __init__(self, shape:Tuple[int, ...], dtype:np.dtype, base:Optional[Buffer]=None):
-        self.shape, self.dtype = shape, dtype
-        self.size = functools.reduce(lambda x,y: x * y, self.shape)
-        if base is None:
-            self.buffer = Buffer(self.size, self.dtype)
-        else:
-            #assert base.base == base, f"the base must be its own base"
-            self.base = base
+class Buffer:
+    def __init__(self, base:Union[np.ndarray, list, tuple], shape:Tuple[int, ...], dtype): #base can take constants too
+        self.base, self.shape, self.dtype = base, shape, dtype
 
-    def __repr__(self): 
-        return f"<LazyBuffer: shape: {self.shape}, dtype: {self.dtype}"
+    @staticmethod
+    def create(base,):
+        print(base)
+        if not isinstance(base, np.ndarray):
+            base = np.array(base)
+        # from this point, base must be an ndarray
+        return Buffer(base=base, shape=base.shape, dtype=base.dtype)
+
+    def __repr__(self):
+        return f"Buffer(shape:{self.shape}, dtype:{self.dtype})"
+    
+

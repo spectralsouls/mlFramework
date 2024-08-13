@@ -2,6 +2,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Union, List, Tuple
 import functools
+#from buffer import Buffer
 
 # **** all fxns involving shapes need to work with ints and tuples as paramaters ****
 #              *** make -1 as a parameter work for the movement ops ***
@@ -25,8 +26,6 @@ class Function:
         ctx = fxn(
             *x,
         )
-        # t.data.data for t in x if isinstance(t.data, tensor) else t.data # remove this line later
-        # data = [t.data for t in x] if not isinstance(t.data, tensor) else [t.data for t in x]
         ret = tensor(ctx.forward(*[t.data for t in x], **kwargs))
         ret.requires_grad = ctx.requires_grad
         (ret.ctx,) = (ctx if ctx.requires_grad else None,)
@@ -43,19 +42,23 @@ def broadcasted(x) -> tensor:
 
 
 class tensor:
-    def __init__(self, data: Union[List, np.ndarray, int, float], dtype=np.int32, requires_grad: bool = False):
+    def __init__(self, data:Union[List, np.ndarray, int, float], requires_grad: bool = False):
         self.ctx, self.grad = None, None
         self.requires_grad = requires_grad
         # tensor class is the higher level api that the user uses, ndarrays will for now be the lower level abstraction
+        data = data.data if isinstance(data, tensor) else data
         if not isinstance(data, np.ndarray):
             data = np.array(data)
-        self.data = [list(d for d in data)] if len(data.shape) > 0 else data.item()  # for scalar arrays
-        self.data, self.dtype = data, dtype
+        self.data = data if len(data.shape) > 0 else data.item()  # for scalar arrays
         # self.size = () if len(self.shape) == 0 else len(data)
 
     @property
     def shape(self):
-        return np.array(self.data, self.dtype).shape
+        return np.array(self.data).shape
+   
+    @property
+    def dtype(self):
+        return np.array(self.data).dtype
 
     def numpy(self):
         return np.array(self.data)
@@ -140,7 +143,7 @@ class tensor:
 
     # ml ops
     def linear(self, weights: tensor, bias=None):  # backwards pass of linear is most likely wrong
-        out = self * weights.transpose()  # .sum(axis=1)
+        out = (self * weights.transpose()).sum(axis=1)
         return out + bias if bias is not None else out
 
     def mean(self):

@@ -1,4 +1,4 @@
-from tensor import tensor
+from mlf.tensor import tensor
 
 
 class Linear:

@@ -1,5 +1,5 @@
 import unittest
-from tensor import tensor
+from mlf.tensor import tensor
 import numpy as np
 
 

@@ -2,7 +2,7 @@ import numpy as np
 
 
 # Storage is where the data is held
-class Buffer:
+class B:
     def __init__(self, size:int, dtype:np.dtype, allocator):
         self.size = size
         self.allocator = allocator
