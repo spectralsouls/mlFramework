@@ -161,8 +161,11 @@ class tensor:
 
     def mean(self, axis=None, keepdims=False):
         num = self.sum(axis=axis, keepdims=keepdims)
-        vals = tuple(x for x,y in itertools.zip_longest(self.shape, num.shape, fillvalue=num.shape[0]) if x != y )
-        denom = functools.reduce(lambda x,y: x*y, vals) if len(self.shape) > 0 else 1
+        if len(self.shape) > 0:
+            vals = tuple(x for x,y in itertools.zip_longest(self.shape, num.shape, fillvalue=num.shape[0]) if x != y ) if len(num.shape) > 0 else self.shape
+            denom = functools.reduce(lambda x,y: x*y, vals) 
+        else:
+            denom = 1
         return num.div(denom)
 
     def square(self):

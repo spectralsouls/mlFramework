@@ -11,8 +11,8 @@ def prepare_tensors(shape, forward_only, vals):
     np.random.seed(0)
     data = vals if vals is not None else [np.random.uniform(size=s) for s in shape]
     pytorch = [
-        torch.tensor(data=d, requires_grad=(not forward_only), dtype=torch.float64) for d in data
-    ]  # should change to float32 later
+        torch.tensor(data=d, requires_grad=(not forward_only)) for d in data
+    ]
     native = [tensor(data=d.detach().numpy(), requires_grad=(not forward_only)) for d in pytorch]
     return pytorch, native
 
@@ -20,8 +20,9 @@ def prepare_tensors(shape, forward_only, vals):
 def compare(msg, torch, native):
     # print(f"torch:{torch}, native:{native}")
     print(msg)
-    np.testing.assert_allclose(torch.numpy(), native.numpy())
-
+    # need to set the rtol, atol manually due to floating point imprecision, passes without manual tuning when using float64
+    np.testing.assert_allclose(torch.numpy(), native.numpy(), atol=1e-6)
+#rtol=1e-6, atol=1e-6
 
 def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False, vals=None):
     native_fxn = torch_fxn if native_fxn is None else native_fxn
@@ -73,7 +74,7 @@ class TestUnaryOps(unittest.TestCase):
         print("***RELU***")
         perform_test([(4, 5)], lambda x: x.relu())
         perform_test([()], lambda x: x.relu())
-        perform_test([(1, 2)], lambda x: x.relu(), vals=[[1, 2, -3, -4, 5, 0]])
+        perform_test([(1, 2)], lambda x: x.relu(), vals=[[1.0, 2.0, -3.0, -4.0, 5.0, 0.0]])
 
     def test_sigmoid(self):
         print("***SIGMOID***")
