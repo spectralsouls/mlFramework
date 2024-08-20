@@ -1,7 +1,7 @@
 from __future__ import annotations
 import numpy as np
 from typing import Union, List, Tuple
-import functools
+import functools, itertools
 #from buffer import Buffer
 
 # **** all fxns involving shapes need to work with ints and tuples as paramaters ****
@@ -50,6 +50,7 @@ class tensor:
         if not isinstance(data, np.ndarray):
             data = np.array(data)
         self.data = data if len(data.shape) > 0 else data.item()  # for scalar arrays
+        self.data = data.astype(np.float32)
         # self.size = () if len(self.shape) == 0 else len(data)
 
     @property
@@ -137,18 +138,30 @@ class tensor:
     def sum(self, axis=None, keepdims=False):
         return F.Sum.apply(self, axis=axis, keepdims=keepdims)
 
+    # creation methods
     @staticmethod
     def random(shape: tuple, requires_grad=False):
         return tensor(np.random.uniform(size=shape), requires_grad=requires_grad)
+    
+    def zeroes(shape:tuple, requires_grad=False):
+        return tensor(np.zeros(shape), requires_grad=requires_grad)
+    
+    def ones(shape:tuple, requires_grad=False):
+        return tensor(np.ones(shape), requires_grad=requires_grad)
 
     # ml ops
     def linear(self, weights: tensor, bias=None):  # backwards pass of linear is most likely wrong
         out = (self * weights.transpose()).sum(axis=1)
         return out + bias if bias is not None else out
+    
+    def batchnorm(self,): #weights: tensor, bias: tensor, epsilon: float
+        #b_mean = self.mean(axis=tuple(x for x in range(len(self.shape))))
+        pass
 
-    def mean(self):
-        num = self.sum()
-        denom = functools.reduce(lambda x, y: x * y, self.shape) if len(self.shape) > 0 else 1
+    def mean(self, axis=None):
+        num = self.sum(axis=axis)
+        vals = tuple(x if x != y else 1 for x,y in itertools.zip_longest(self.shape, num.shape, fillvalue=num.shape[0]))
+        denom = functools.reduce(lambda x,y: x*y, vals) if len(self.shape) > 0 else 1
         return num.div(denom)
 
     def square(self):
