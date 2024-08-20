@@ -155,7 +155,9 @@ class tensor:
         return out + bias if bias is not None else out
     
     def batchnorm(self,): #weights: tensor, bias: tensor, epsilon: float
-        #b_mean = self.mean(axis=tuple(x for x in range(len(self.shape))))
+        vals = tuple(x for x in range(len(self.shape)) if x != 1)
+        print(vals)
+        b_mean = self.mean(axis=tuple(x for x in range(len(self.shape))))
         pass
 
     def mean(self, axis=None):

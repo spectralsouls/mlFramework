@@ -5,7 +5,7 @@ from mlf.tensor import tensor
 import math
 
 # make a FORWARD_ONLY env variable
-
+# create tests for mean, linear and batchnorm,
 
 def prepare_tensors(shape, forward_only, vals):
     np.random.seed(0)
