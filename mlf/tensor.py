@@ -127,7 +127,6 @@ class tensor:
             padded = self.reshape(padded_shape)
         else:
             padded = self
-        print(padded)
         return F.Expand.apply(padded, newshape=newshape)
 
     def transpose(self):
@@ -152,13 +151,13 @@ class tensor:
     # ml ops
     def linear(self, weights: tensor, bias=None):  # backwards pass of linear is most likely wrong
         out = (self * weights.transpose()).sum(axis=1)
-        return out + bias if bias is not None else out
+        return out.add(bias) if bias is not None else out
     
-    def batchnorm(self,): #weights: tensor, bias: tensor, epsilon: float
-        mean_axis = tuple(x for x in range(len(self.shape)) if x != 1)
-        b_mean = self.mean(axis=mean_axis)
-        b_var =  self.square().mean(axis=mean_axis, keepdims=True).expand(self.shape) - b_mean.square().reshape((1,3,1,1))
-        print(f"VAR: {b_var}")
+    def batchnorm(self, mean, var, epsilon: float): #weights: tensor, bias: tensor, 
+        num = self - mean.expand(self.shape)
+        denom = (var + epsilon).sqrt()
+        return num.div(denom)
+
 
     def mean(self, axis=None, keepdims=False):
         num = self.sum(axis=axis, keepdims=keepdims)
@@ -167,7 +166,7 @@ class tensor:
         return num.div(denom)
 
     def square(self):
-        return self * self
+        return self.mul(self)
 
     def __repr__(self):
         return f"tensor({self.data}, dtype={self.dtype})"  # TODO: make a better __repr__
