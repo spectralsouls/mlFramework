@@ -155,14 +155,14 @@ class tensor:
         return out + bias if bias is not None else out
     
     def batchnorm(self,): #weights: tensor, bias: tensor, epsilon: float
-        vals = tuple(x for x in range(len(self.shape)) if x != 1)
-        print(vals)
-        b_mean = self.mean(axis=tuple(x for x in range(len(self.shape))))
-        pass
+        mean_axis = tuple(x for x in range(len(self.shape)) if x != 1)
+        b_mean = self.mean(axis=mean_axis)
+        b_var =  self.square().mean(axis=mean_axis, keepdims=True).expand(self.shape) - b_mean.square().reshape((1,3,1,1))
+        print(f"VAR: {b_var}")
 
-    def mean(self, axis=None):
-        num = self.sum(axis=axis)
-        vals = tuple(x if x != y else 1 for x,y in itertools.zip_longest(self.shape, num.shape, fillvalue=num.shape[0]))
+    def mean(self, axis=None, keepdims=False):
+        num = self.sum(axis=axis, keepdims=keepdims)
+        vals = tuple(x for x,y in itertools.zip_longest(self.shape, num.shape, fillvalue=num.shape[0]) if x != y )
         denom = functools.reduce(lambda x,y: x*y, vals) if len(self.shape) > 0 else 1
         return num.div(denom)
 
@@ -173,7 +173,7 @@ class tensor:
         return f"tensor({self.data}, dtype={self.dtype})"  # TODO: make a better __repr__
 
     def __getitem__(self, idx):
-        return np.array(self.data)[idx]
+        return tensor(np.array(self.data)[idx])
 
     def __neg__(self):
         return self.negative()
