@@ -2,7 +2,7 @@ from __future__ import annotations
 import numpy as np
 from typing import Union, List, Tuple
 import functools, itertools
-#from buffer import Buffer
+from mlf.buffer import Numpy
 
 # **** all fxns involving shapes need to work with ints and tuples as paramaters ****
 #              *** make -1 as a parameter work for the movement ops ***
@@ -40,22 +40,19 @@ def broadcasted(x) -> tensor:
         x = tensor(x)
     return x
 
-
+#todo: self.data should be a memoryview
 class tensor:
-    def __init__(self, data:Union[List, np.ndarray, int, float], requires_grad: bool = False):
+    def __init__(self, data:Union[List, np.ndarray, int, float], dtype=np.float32, requires_grad: bool = False):
         self.ctx, self.grad = None, None
         self.requires_grad = requires_grad
         # tensor class is the higher level api that the user uses, ndarrays will for now be the lower level abstraction
         data = data.data if isinstance(data, tensor) else data
-        if not isinstance(data, np.ndarray):
-            data = np.array(data)
-        self.data = data if len(data.shape) > 0 else data.item()  # for scalar arrays
-        self.data = data.astype(np.float32)
-        # self.size = () if len(self.shape) == 0 else len(data)
+        data = Numpy(data, dtype=dtype) if not isinstance(data, Numpy) else data
+        self.data = data
 
     @property
     def shape(self):
-        return np.array(self.data).shape
+        return self.data.shape
    
     @property
     def dtype(self):
@@ -172,10 +169,10 @@ class tensor:
         return self.mul(self)
 
     def __repr__(self):
-        return f"tensor({self.data}, dtype={self.dtype})"  # TODO: make a better __repr__
+        return f"tensor({self.data.array}, dtype={self.dtype})"  # TODO: make a better __repr__
 
     def __getitem__(self, idx):
-        return tensor(np.array(self.data)[idx])
+        return tensor(self.data.array[idx])
 
     def __neg__(self):
         return self.negative()
