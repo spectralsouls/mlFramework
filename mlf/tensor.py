@@ -56,10 +56,10 @@ class tensor:
    
     @property
     def dtype(self):
-        return np.array(self.data).dtype
+        return np.array(self.data).dtype # replace this
 
     def numpy(self):
-        return np.array(self.data)
+        return np.array(self.data) # fix this later
 
     # unary ops
     def negative(self):
@@ -172,10 +172,10 @@ class tensor:
         return self.mul(self)
 
     def __repr__(self):
-        return f"tensor({self.data.array}, dtype={self.dtype})"  # TODO: make a better __repr__
+        return f"tensor({self.data.data}, dtype={self.dtype})"  # TODO: make a better __repr__
 
     def __getitem__(self, idx):
-        return tensor(self.data.array[idx])
+        return tensor(self.data.data[idx])
 
     def __neg__(self):
         return self.negative()
@@ -191,6 +191,9 @@ class tensor:
 
     def __truediv__(self, x):
         return self.div(x)
+    
+    def __eq__(self, x):
+        return self.negate(self != x)
 
     # depth first search
     def dfs(self):

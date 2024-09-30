@@ -7,7 +7,8 @@ import numpy as np
 # Unary Fxns
 class Negative(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        return np.negative(x)
+        return self.execute(UnaryOps.NEG)
+        #return np.negative(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return -(grad)
@@ -78,6 +79,14 @@ class Sigmoid(Function):
 
 
 # Binary Fxns
+
+class Neq(Function): #not equal
+    def forward(self, x: np.ndarray, y) -> np.ndarray:
+        return x != y
+    
+    def backward(self, grad: np.ndarray) -> np.ndarray:
+        return None, None
+
 class Add(Function):
     def forward(self, x: np.ndarray, y) -> np.ndarray:
         return np.add(x, y)
