@@ -1,10 +1,12 @@
 import unittest
 import torch
 import numpy as np
-from mlf.tensor import tensor
+import os
 import math
+from mlf.tensor import tensor
 
-# make a FORWARD_ONLY env variable
+FORWARD_ONLY = os.getenv("FORWARD_ONLY", 0)
+
 # create tests for mean, linear and batchnorm,
 
 def prepare_tensors(shape, forward_only, vals):
@@ -30,7 +32,7 @@ def perform_test(shape, torch_fxn, native_fxn=None, forward_only=False, vals=Non
     torch_result, native_result = torch_fxn(*pytorch_tensor), native_fxn(*native_tensor)
     # print(f"Result: {torch_result}")
     compare("FORWARD", torch_result.detach(), native_result)
-    if not forward_only:
+    if not forward_only and not FORWARD_ONLY:
         (
             torch_result.square().mean().backward(),
             native_result.square().mean().backwards(),
