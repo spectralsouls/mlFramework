@@ -87,6 +87,9 @@ class tensor:
         return F.Sigmoid.apply(self)
 
     # binary ops
+    def negate(self, y):
+        return not(F.Neq.apply(self, broadcasted(y)))
+
     def add(self, y):
         return F.Add.apply(self, broadcasted(y))
 
