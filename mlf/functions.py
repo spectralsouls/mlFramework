@@ -1,13 +1,15 @@
 from mlf.tensor import Function
+from mlf.other.ops import UnaryOps, BinaryOps
 import numpy as np
 
 # TODO: make tests for when a function gets an undefined value as a result (Sqrt, Log, Div)
 
+#TODO Exp and Log are different from the ops i.e. e^x and ln(x) != EXP2, LOG2
 
 # Unary Fxns
 class Negative(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        return self.execute(UnaryOps.NEG)
+        return x.execute(UnaryOps.NEG)
         #return np.negative(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
@@ -17,7 +19,8 @@ class Negative(Function):
 class Reciprocal(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = np.array(x, dtype=np.float32)
-        return np.reciprocal(self.x)
+        return x.execute(UnaryOps.RECIP)
+        #return np.reciprocal(self.x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return -(self.x**-2) * grad
@@ -26,15 +29,17 @@ class Reciprocal(Function):
 class Sqrt(Function):  # needs to handle negative numbers
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.sqrt(x)
+        return x.execute(UnaryOps.SQRT)
+        #return np.sqrt(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return (0.5) * (1 / self.x**0.5) * grad
 
 
-class Exp(Function):
+class Exp(Function): #e^x
     def forward(self, x: np.ndarray) -> np.ndarray:
-        self.ret = np.exp(x)
+        self.ret = x.execute(UnaryOps.EXP2)
+        #np.exp(x)
         return self.ret
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
@@ -44,7 +49,8 @@ class Exp(Function):
 class Log(Function):  # ln(x) # needs to handle negative numbers and 0
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.log(x)
+        return x.execute(UnaryOps.LOG2)
+        #return np.log(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return 1 / self.x * grad
@@ -53,7 +59,8 @@ class Log(Function):  # ln(x) # needs to handle negative numbers and 0
 class Sin(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.sin(x)
+        return x.execute(UnaryOps.SIN)
+        #return np.sin(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return np.cos(self.x) * grad
@@ -80,7 +87,7 @@ class Sigmoid(Function):
 
 # Binary Fxns
 
-class Neq(Function): #not equal
+class Neq(Function): # !=
     def forward(self, x: np.ndarray, y) -> np.ndarray:
         return x != y
     

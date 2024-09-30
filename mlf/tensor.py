@@ -56,10 +56,10 @@ class tensor:
    
     @property
     def dtype(self):
-        return np.array(self.data).dtype # replace this
+        return self.data.dtype # replace this
 
     def numpy(self):
-        return np.array(self.data) # fix this later
+        return np.array(self.data.data) # fix this later
 
     # unary ops
     def negative(self):
