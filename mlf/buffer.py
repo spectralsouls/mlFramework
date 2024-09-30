@@ -12,30 +12,30 @@ class Numpy:
             x = self.data
             match op:
                 case UnaryOps.EXP2:
-                    return np.exp(x)
+                    ret = np.exp(x)
                 case UnaryOps.LOG2:
-                    return np.log(x)
+                    ret = np.log(x)
                 case UnaryOps.CAST:
                     pass
                 case UnaryOps.BITCAST:
                     pass
                 case UnaryOps.SIN:
-                    return np.sin(x)
+                    ret = np.sin(x)
                 case UnaryOps.SQRT:
-                    return np.sqrt(x)
+                    ret = np.sqrt(x)
                 case UnaryOps.NEG:
-                    return np.negative(x)
+                    ret = np.negative(x)
                 case UnaryOps.RECIP:
-                    return np.reciprocal(x)
+                    ret = np.reciprocal(x)
         elif isinstance(op, BinaryOps):
             x,y = self.data, inp[0].data
             match op:
                 case BinaryOps.ADD:
-                    return np.add(x, y)
+                    ret = np.add(x, y)
                 case BinaryOps.MUL:
-                    return np.multiply(x, y)
+                    ret = np.multiply(x, y)
                 case BinaryOps.IDIV:
-                    return np.divide(x, y)
+                    ret = np.divide(x, y)
                 case BinaryOps.MAX:
                     pass
                 case BinaryOps.MOD:
@@ -50,5 +50,6 @@ class Numpy:
                     pass
                 case BinaryOps.SHL:
                     pass
+        return Numpy(ret, ret.dtype)
 
     def __repr__(self): return f"Numpy({self.data})"

@@ -1,5 +1,6 @@
 from mlf.tensor import Function
 from mlf.other.ops import UnaryOps, BinaryOps
+from mlf.buffer import Numpy
 import numpy as np
 
 # TODO: make tests for when a function gets an undefined value as a result (Sqrt, Log, Div)
@@ -77,8 +78,10 @@ class Relu(Function):
 
 class Sigmoid(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        denom = np.add(1, np.exp(-x))
-        self.x = np.divide(1, denom)
+        #denom = np.add(1, np.exp(-x))
+        denom = x.execute(UnaryOps.NEG).execute(UnaryOps.EXP2).execute(BinaryOps.ADD, Numpy(1, np.float32))
+        self.x = Numpy(1, np.float32).execute(BinaryOps.IDIV, denom)
+        #self.x = np.divide(1, denom)
         return self.x
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
