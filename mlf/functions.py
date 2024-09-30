@@ -1,13 +1,17 @@
 from mlf.tensor import Function
+from mlf.other.ops import UnaryOps, BinaryOps
+from mlf.buffer import Numpy
 import numpy as np
 
 # TODO: make tests for when a function gets an undefined value as a result (Sqrt, Log, Div)
 
+#TODO Exp and Log are different from the ops i.e. e^x and ln(x) != EXP2, LOG2
 
 # Unary Fxns
 class Negative(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        return np.negative(x)
+        return x.execute(UnaryOps.NEG)
+        #return np.negative(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return -(grad)
@@ -16,7 +20,8 @@ class Negative(Function):
 class Reciprocal(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = np.array(x, dtype=np.float32)
-        return np.reciprocal(self.x)
+        return x.execute(UnaryOps.RECIP)
+        #return np.reciprocal(self.x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return -(self.x**-2) * grad
@@ -25,15 +30,17 @@ class Reciprocal(Function):
 class Sqrt(Function):  # needs to handle negative numbers
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.sqrt(x)
+        return x.execute(UnaryOps.SQRT)
+        #return np.sqrt(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return (0.5) * (1 / self.x**0.5) * grad
 
 
-class Exp(Function):
+class Exp(Function): # e^x
     def forward(self, x: np.ndarray) -> np.ndarray:
-        self.ret = np.exp(x)
+        self.ret = x.execute(UnaryOps.EXP2)
+        #np.exp(x)
         return self.ret
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
@@ -43,7 +50,8 @@ class Exp(Function):
 class Log(Function):  # ln(x) # needs to handle negative numbers and 0
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.log(x)
+        return x.execute(UnaryOps.LOG2)
+        #return np.log(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return 1 / self.x * grad
@@ -52,7 +60,8 @@ class Log(Function):  # ln(x) # needs to handle negative numbers and 0
 class Sin(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.x = x
-        return np.sin(x)
+        return x.execute(UnaryOps.SIN)
+        #return np.sin(x)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return np.cos(self.x) * grad
@@ -69,8 +78,10 @@ class Relu(Function):
 
 class Sigmoid(Function):
     def forward(self, x: np.ndarray) -> np.ndarray:
-        denom = np.add(1, np.exp(-x))
-        self.x = np.divide(1, denom)
+        #denom = np.add(1, np.exp(-x))
+        denom = x.execute(UnaryOps.NEG).execute(UnaryOps.EXP2).execute(BinaryOps.ADD, Numpy(1, np.float32))
+        self.x = Numpy(1, np.float32).execute(BinaryOps.IDIV, denom)
+        #self.x = np.divide(1, denom)
         return self.x
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
@@ -78,9 +89,18 @@ class Sigmoid(Function):
 
 
 # Binary Fxns
+
+class Neq(Function): # !=
+    def forward(self, x: np.ndarray, y) -> np.ndarray:
+        return x != y
+    
+    def backward(self, grad: np.ndarray) -> np.ndarray:
+        return None, None
+
 class Add(Function):
     def forward(self, x: np.ndarray, y) -> np.ndarray:
-        return np.add(x, y)
+        return x.execute(BinaryOps.ADD, y)
+        #return np.add(x, y)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return grad if self.needs_grad[0] else None, grad if self.needs_grad[1] else None
@@ -88,7 +108,7 @@ class Add(Function):
 
 class Sub(Function):
     def forward(self, x: np.ndarray, y) -> np.ndarray:
-        return x + -(y)
+        return x.execute(BinaryOps.ADD, y.execute(UnaryOps.NEG))
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return grad if self.needs_grad[0] else None, -grad if self.needs_grad[1] else None
@@ -97,7 +117,8 @@ class Sub(Function):
 class Mul(Function):
     def forward(self, x: np.ndarray, y) -> np.ndarray:
         self.x, self.y = x, y
-        return np.multiply(x, y)
+        return x.execute(BinaryOps.MUL, y)
+        #return np.multiply(x, y)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return self.y * grad if self.needs_grad[0] else None, self.x * grad if self.needs_grad[1] else None
@@ -106,7 +127,8 @@ class Mul(Function):
 class Div(Function):  # needs to handle division by 0
     def forward(self, x: np.ndarray, y) -> np.ndarray:
         self.x, self.y = x, y
-        return np.divide(x, y)
+        return x.execute(BinaryOps.IDIV, y)
+        #return np.divide(x, y)
 
     def backward(self, grad: np.ndarray) -> np.ndarray:
         return (1 / self.y) * grad if self.needs_grad[0] else None, (-self.x * self.y**-2) * grad if self.needs_grad[
